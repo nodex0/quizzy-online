@@ -423,7 +423,7 @@
         "options": [
             "Las instrucciones que en el momento de ser aplicadas resulten contrarias al ordenamiento jurídico.",
             "Las instrucciones que en el momento de ser otorgadas resulten contrarias al ordenamiento jurídico.",
-            "Las respuestas a y b son correctas.",
+            "Las respuestas $0 y $1 son correctas.",
             "Las instrucciones que en el momento de ser aplicadas no se aprueben por el comité de ética del centro."
         ],
         "answerIndex": 0
