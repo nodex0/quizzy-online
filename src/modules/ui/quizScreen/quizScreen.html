@@ -1,0 +1,63 @@
+<template>
+    <div if:false={showSummaryScreen} class="relative isolate overflow-hidden bg-gray-800 border-y sm:border-2 border-gray-600 py-8 sm:py-16 sm:rounded-md shadow-lg">
+        <div class="px-6 lg:px-8">
+            <div class="mx-auto grid lg:max-w-3xl grid-cols-1 gap-y-16 gap-x-8 content-center">
+                <div if:true={question} class="">
+                    <div class="flex">
+                        <div class="flex-auto">
+                            <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">{title}</h2>
+                        </div>
+                        <div class="flex-auto text-right">
+                            <p class="text-3xl font-bold text-gray-300">{progressText}</p>
+                        </div>
+                    </div>
+                    <p class="mt-4 text-lg leading-8 text-gray-300">{question.id}. {question.question}</p>
+                    <div if:false={quizFinished} class="mt-6" onclick={answerClickHandler}>
+                        <template for:each={questionOptions} for:item="option">
+                            <p key={option.id} class="px-3.5 text-lg transition-all cursor-pointer hover:outline outline-offset-2 outline-4 rounded outline-cyan-700 text-gray-200 mb-3"><span>{option.number} </span>{option.text}</p>
+                        </template>
+                    </div>
+                    <div if:true={quizFinished} class="mt-6" onclick={answerClickHandler}>
+                        <template for:each={questionOptions} for:item="option">
+                            <template if:true={option.isCorrect}>
+                                <p key={option.id} class="px-3.5 text-lg transition-all cursor-pointer outline outline-offset-2 outline-4 rounded outline-green-700 text-gray-200 mb-3"><span>{option.number} </span>{option.text}</p>
+                            </template>
+                            <template if:false={option.isCorrect}>
+                                <p if:true={option.isSelected} key={option.id} class="px-3.5 text-lg transition-all cursor-pointer outline outline-offset-2 outline-4 rounded outline-red-700 text-gray-200 mb-3"><span>{option.number} </span>{option.text}</p>
+                                <p if:false={option.isSelected} key={option.id} class="px-3.5 text-lg transition-all cursor-pointer hover:outline outline-offset-2 outline-4 rounded outline-cyan-700 text-gray-200 mb-3"><span>{option.number} </span>{option.text}</p>
+                            </template>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div if:true={showSummaryScreen} class="relative isolate overflow-hidden bg-gray-800 border-y sm:border-2 border-gray-600 py-8 sm:py-16 sm:rounded-md shadow-lg">
+        <div class="px-6 lg:px-8">
+            <div class="mx-auto grid lg:max-w-3xl grid-cols-1 gap-y-16 gap-x-8 content-center">
+                <div if:true={question} class="">
+                    <div class="flex">
+                        <div class="flex-auto">
+                            <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">{title}</h2>
+                            <h3 class="text-xl tracking-tight text-gray-300 sm:text-xl">Resultados</h3>
+                        </div>
+                        <div class="flex-auto text-right ml-5">
+                            <p class="text-3xl font-bold text-gray-300">{accuracyResult}</p>
+                        </div>
+                    </div>
+                    <div class="mt-6 flex flex-wrap gap-4" onclick={reviewClickHandler}>
+                        <template for:each={answers} for:item="answer">
+                            <p if:true={answer.right} key={answer.id} class="px-3.5 text-lg transition-all cursor-pointer border-2 border-green-400 hover:outline outline-offset-2 outline-4 rounded outline-cyan-700 text-gray-200 mb-3">{answer.number}</p>
+                            <p if:false={answer.right} key={answer.id} class="px-3.5 text-lg transition-all cursor-pointer border-2 border-red-400 hover:outline outline-offset-2 outline-4 rounded outline-cyan-700 text-gray-200 mb-3">{answer.number}</p>
+                        </template>
+                    </div>
+                    <button onclick={returnHomeHandler} class="py-2.5 px-5 mr-2 mb-2 mt-5 font-bold text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700 inline-flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 mr-2 -ml-1">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"></path>
+                          </svg> Volver a la página de inicio
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
