@@ -1,3 +1,49 @@
-<!doctype html><html lang="en" class="h-full"><head><meta charset="utf-8"/><title>Quizzy</title><style>body {
-                font-family: Arial, Helvetica, sans-serif;
-            }</style><link rel="stylesheet" href="./resources/tailwind.css"/><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/><link rel="shortcut icon" href="./resources/favicon.ico"/><script defer="defer" src="./app-9e91f77db87b50f176d5.js"></script></head><body class="h-screen"><div id="main" class="h-full"></div></body></html>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Celador/a Osakidetza — Test de 200 preguntas</title>
+    <link rel="shortcut icon" href="./favicon.ico">
+    <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+    <div class="wrap">
+        <header>
+            <div>
+                <h1>Celador/a — OPE Osakidetza</h1>
+                <p class="subtitle">Test de práctica · 200 preguntas</p>
+            </div>
+            <div class="stats">
+                <div class="stat">Pregunta<b><span id="current">1</span>/<span id="total">200</span></b></div>
+                <div class="stat">Aciertos<b id="correct">0</b></div>
+                <div class="stat">Fallos<b id="wrong">0</b></div>
+                <div class="stat">% acierto<b id="pct">—</b></div>
+            </div>
+        </header>
+
+        <div class="notice">✏️ Puedes editar cualquier pregunta o respuesta pulsando el botón <b>Editar</b>. Tus cambios se guardan automáticamente en este navegador. Pulsa <b>Reiniciar</b> para volver al conjunto original.</div>
+
+        <div class="controls">
+            <div class="mode-toggle">
+                <button id="mode-seq" class="active">Orden</button>
+                <button id="mode-rand">Aleatorio</button>
+            </div>
+            <button id="restart">↻ Reiniciar</button>
+            <button id="review" disabled>Ver fallos</button>
+        </div>
+
+        <div class="progress"><div class="progress-bar" id="bar" style="width:0.5%"></div></div>
+
+        <div id="quiz-area"></div>
+
+        <details class="jumper">
+            <summary>Ir a pregunta…</summary>
+            <div class="grid" id="grid"></div>
+        </details>
+    </div>
+
+    <script src="./data/questions.js"></script>
+    <script src="./app.js"></script>
+</body>
+</html>
