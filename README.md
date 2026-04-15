@@ -61,6 +61,45 @@ This writes `src/data/auxiliar-admin.js`. Then add
 - "Ver fallos" — review only the questions you got wrong.
 - Light/dark mode with system-preference detection.
 - Full reset of the current quiz.
+- Multilanguage UI (Español / Euskera) with browser-language detection.
+
+## Multilanguage
+
+The UI is fully translatable. Strings live in
+[`src/i18n.js`](src/i18n.js) under the `TRANSLATIONS` table. To add a new
+language, add a new entry (e.g. `fr: { ... }`) and a new `{ code, label, short }`
+row in `LANGS`.
+
+**Question sets** can also be translated. Each set and each question
+accepts an optional `translations` map; the **answer index (`a`)** is always
+shared across languages because the correct answer never changes.
+
+```js
+// Set metadata with translations:
+{
+  id: 'celador',
+  name: 'Celador/a — Parte específica',
+  description: 'OPE Osakidetza · 200 preguntas',
+  translations: {
+    eu: { name: 'Zeladorea — Berariazko zatia',
+          description: 'OPE Osakidetza · 200 galdera' }
+  },
+  questions: [ /* ... */ ]
+}
+
+// Per-question translations (optional, falls back to base text):
+{
+  q: 'Pregunta en castellano',
+  o: ['Opción A', 'Opción B', 'Opción C', 'Opción D'],
+  a: 0,
+  translations: {
+    eu: { q: 'Galdera euskaraz',
+          o: ['A aukera', 'B aukera', 'C aukera', 'D aukera'] }
+  }
+}
+```
+
+If a translation is missing, the UI falls back to the base (Spanish) text.
 
 ## Run locally
 

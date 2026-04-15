@@ -154,9 +154,7 @@ function main() {
             `${changed}/${itemCount} answers would change in ${setPath}.`
         );
         for (const m of mismatches.slice(0, 10)) {
-            console.log(
-                `  Q${m.n}: ${'abcd'[m.from]} → ${'abcd'[m.to]}`
-            );
+            console.log(`  Q${m.n}: ${'abcd'[m.from]} → ${'abcd'[m.to]}`);
         }
         if (mismatches.length > 10) {
             console.log(`  … and ${mismatches.length - 10} more.`);

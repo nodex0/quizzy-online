@@ -1,9 +1,18 @@
 // Celador/a OPE Osakidetza — parte específica.
 // Format per item: { q: String, o: [a,b,c,d], a: Number (0..3 correct index) }
+// Optional multilanguage: add a `translations` key per item, e.g.
+//   { q: "...", o: [...], a: 0, translations: { eu: { q: "...", o: [...] } } }
+// The `a` (answer index) is shared across languages — answers never translate.
 (window.QUESTION_SETS = window.QUESTION_SETS || []).push({
   id: 'celador',
   name: 'Celador/a — Parte específica',
   description: 'OPE Osakidetza · 200 preguntas',
+  translations: {
+    eu: {
+      name: 'Zeladorea — Berariazko zatia',
+      description: 'OPE Osakidetza · 200 galdera'
+    }
+  },
   questions: [
   {q:"En Osakidetza, para todos los tipos de jornada, excepto la nocturna, el trabajo efectivo anual a realizar en concepto de jornada ordinaria será de:",o:["1592 horas.","1433 horas.","1447 horas.","1492 horas."],a:0},
   {q:"Podrá acogerse a la exención de trabajo nocturno el personal mayor de:",o:["60 años.","55 años.","50 años.","62 años."],a:1},

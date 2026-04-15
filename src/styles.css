@@ -123,6 +123,32 @@ h1 {
     font-size: 16px;
 }
 
+.lang-toggle {
+    display: inline-flex;
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    overflow: hidden;
+}
+.lang-toggle .lang-btn {
+    border: none;
+    border-radius: 0;
+    padding: 8px 12px;
+    background: transparent;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+}
+.lang-toggle .lang-btn:hover {
+    background: var(--hover);
+    color: var(--text);
+}
+.lang-toggle .lang-btn.active {
+    background: var(--accent);
+    color: #fff;
+}
+
 button {
     font: inherit;
     cursor: pointer;
