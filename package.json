@@ -21,7 +21,6 @@
     "repository": "nodex0/quizzy-online",
     "scripts": {
         "start": "node scripts/server.js",
-        "build": "node scripts/build.js",
         "lint": "eslint src/**/*.js",
         "prettier": "prettier --write \"**/*.{css,html,js,json,md}\"",
         "prettier:verify": "prettier --list-different \"**/*.{css,html,js,json,md}\""

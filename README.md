@@ -32,11 +32,11 @@ Or just open `src/index.html` directly in a browser — no build needed.
 
 ## Deploy
 
-GitHub Pages serves [`docs/`](docs/). To refresh it after editing `src/`:
+Pushed to `main` → deployed to GitHub Pages automatically via
+[`.github/workflows/pages.yml`](.github/workflows/pages.yml) (uploads the
+`src/` tree as the Pages artifact). Nothing to build, nothing to commit.
 
-```bash
-npm run build
-```
+One-time setup on the repo: **Settings → Pages → Source: GitHub Actions**.
 
 ## Layout
 
@@ -48,6 +48,7 @@ src/
 ├── data/questions.js  # 200-question bank
 └── favicon.ico
 scripts/
-├── server.js          # Express static server
-└── build.js           # copies src/ → docs/
+└── server.js          # Express static server (local preview)
+.github/workflows/
+└── pages.yml          # Pages auto-deploy
 ```
