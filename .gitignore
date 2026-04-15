@@ -30,3 +30,10 @@ $RECYCLE.BIN/
 
 # Husky
 .husky
+
+# Ruby / Jekyll (Gemfile is committed; Gemfile.lock / _site are not)
+Gemfile.lock
+_site/
+.jekyll-cache/
+.bundle/
+vendor/bundle/

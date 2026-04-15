@@ -1,0 +1,25 @@
+# Minimal Jekyll config — the site is a zero-framework static app under src/,
+# but the legacy GitHub Pages "Deploy from branch" path still invokes Jekyll.
+# Point Jekyll at a dedicated /docs build output and keep the build inert
+# so github-pages v232 can render without choking on a missing source dir.
+source: docs
+destination: docs/_site
+
+# Nothing dynamic — we just want Jekyll to pass the static files through.
+plugins: []
+exclude:
+    - Gemfile
+    - Gemfile.lock
+    - node_modules
+    - package.json
+    - package-lock.json
+    - scripts
+    - src
+    - README.md
+    - eslint.config.js
+    - .prettierrc
+    - .prettierignore
+
+# Silence the jekyll-sass-converter; we ship plain CSS, no SCSS.
+sass:
+    style: compressed
