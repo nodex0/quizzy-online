@@ -58,7 +58,13 @@
             'quiz.next': 'Siguiente →',
             'quiz.subtitle': '{names} · {count} preguntas',
             'restart.confirm':
-                '¿Reiniciar el test?\n\nEsto borrará tus respuestas.'
+                '¿Reiniciar el test?\n\nEsto borrará tus respuestas.',
+            'setup.resumeTitle': 'Test en curso',
+            'setup.resumeMeta': '{names} · {answered} de {total} contestadas',
+            'setup.resumeBtn': 'Continuar →',
+            'setup.discardBtn': 'Descartar',
+            'setup.discardConfirm':
+                '¿Descartar el test en curso?\n\nPerderás las respuestas guardadas.'
         },
         eu: {
             title: 'Quizzy Online — OPE Osakidetza',
@@ -97,7 +103,14 @@
             'quiz.next': 'Hurrengoa →',
             'quiz.subtitle': '{names} · {count} galdera',
             'restart.confirm':
-                'Testa berrabiarazi?\n\nHonek zure erantzunak ezabatuko ditu.'
+                'Testa berrabiarazi?\n\nHonek zure erantzunak ezabatuko ditu.',
+            'setup.resumeTitle': 'Testa martxan',
+            'setup.resumeMeta':
+                '{names} · {total}-(e)tik {answered} erantzunda',
+            'setup.resumeBtn': 'Jarraitu →',
+            'setup.discardBtn': 'Baztertu',
+            'setup.discardConfirm':
+                'Martxan dagoen testa baztertu?\n\nGordetako erantzunak galduko dituzu.'
         }
     };
 

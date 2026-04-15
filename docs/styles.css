@@ -473,6 +473,38 @@ button:disabled {
     margin-left: 4px;
 }
 
+/* ---------- Resume banner (in-progress quiz) ---------- */
+
+.resume-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+    border-color: var(--accent);
+    background: var(--accent-bg);
+}
+.resume-info {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+.resume-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 2px;
+}
+.resume-meta {
+    font-size: 13px;
+    color: var(--muted);
+}
+.resume-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
 @media (max-width: 520px) {
     h1 {
         font-size: 19px;
@@ -489,5 +521,11 @@ button:disabled {
     .set-count {
         font-size: 11px;
         padding: 2px 8px;
+    }
+    .resume-actions {
+        width: 100%;
+    }
+    .resume-actions button {
+        flex: 1 1 auto;
     }
 }

@@ -8,6 +8,7 @@
     const LETTERS = ['a', 'b', 'c', 'd'];
     const SELECTION_KEY = 'quizzy_selected_sets_v1';
     const THEME_KEY = 'celador_theme';
+    const PROGRESS_KEY = 'quizzy_progress_v1';
 
     function loadSelection() {
         try {
@@ -29,6 +30,119 @@
         } catch {
             /* ignore */
         }
+    }
+
+    // ---------- Progress persistence ----------
+
+    function saveProgress() {
+        if (state.view !== 'quiz' || !state.selectedSets.length) return;
+        try {
+            const snapshot = {
+                v: 1,
+                selectedSets: state.selectedSets.slice(),
+                setSizes: state.selectedSets.map(
+                    (id) => (setQuestionsById[id] || []).length
+                ),
+                mode: state.mode,
+                order: state.order.slice(),
+                pos: state.pos,
+                answers: state.answers.map((a) =>
+                    a ? { picked: a.picked, correct: !!a.correct } : null
+                ),
+                updatedAt: Date.now()
+            };
+            localStorage.setItem(PROGRESS_KEY, JSON.stringify(snapshot));
+        } catch {
+            /* ignore */
+        }
+    }
+
+    function clearProgress() {
+        try {
+            localStorage.removeItem(PROGRESS_KEY);
+        } catch {
+            /* ignore */
+        }
+    }
+
+    // Returns a validated snapshot or null. Validates the saved state against
+    // the currently bundled question sets — if a set disappears or its size
+    // changes, the snapshot is considered stale and is discarded.
+    function loadProgress() {
+        try {
+            const raw = localStorage.getItem(PROGRESS_KEY);
+            if (!raw) return null;
+            const snap = JSON.parse(raw);
+            if (!snap || typeof snap !== 'object') return null;
+            if (!Array.isArray(snap.selectedSets) || !snap.selectedSets.length)
+                return null;
+            // Every set must still exist with the same size.
+            for (let i = 0; i < snap.selectedSets.length; i++) {
+                const id = snap.selectedSets[i];
+                const items = setQuestionsById[id];
+                if (!items) return null;
+                if (
+                    Array.isArray(snap.setSizes) &&
+                    typeof snap.setSizes[i] === 'number' &&
+                    snap.setSizes[i] !== items.length
+                ) {
+                    return null;
+                }
+            }
+            const bankSize = snap.selectedSets.reduce(
+                (acc, id) => acc + (setQuestionsById[id]?.length || 0),
+                0
+            );
+            if (!Array.isArray(snap.order) || snap.order.length !== bankSize)
+                return null;
+            for (const idx of snap.order) {
+                if (
+                    typeof idx !== 'number' ||
+                    idx < 0 ||
+                    idx >= bankSize ||
+                    !Number.isInteger(idx)
+                )
+                    return null;
+            }
+            if (
+                !Array.isArray(snap.answers) ||
+                snap.answers.length !== bankSize
+            )
+                return null;
+            for (const a of snap.answers) {
+                if (a === null) continue;
+                if (
+                    !a ||
+                    typeof a.picked !== 'number' ||
+                    a.picked < 0 ||
+                    a.picked > 3
+                )
+                    return null;
+            }
+            if (
+                typeof snap.pos !== 'number' ||
+                snap.pos < 0 ||
+                snap.pos >= bankSize
+            )
+                return null;
+            if (snap.mode !== 'seq' && snap.mode !== 'rand') return null;
+            return snap;
+        } catch {
+            return null;
+        }
+    }
+
+    function progressSummary(snap) {
+        const answered = snap.answers.filter((a) => a !== null).length;
+        const correct = snap.answers.filter((a) => a && a.correct).length;
+        const wrong = snap.answers.filter((a) => a && !a.correct).length;
+        return {
+            total: snap.answers.length,
+            answered,
+            correct,
+            wrong,
+            pos: snap.pos
+        };
     }
 
     // ---------- Theme ----------
@@ -122,7 +236,8 @@
         modeRand: document.getElementById('mode-rand'),
         restart: document.getElementById('restart'),
         review: document.getElementById('review'),
-        themeToggle: document.getElementById('theme-toggle')
+        themeToggle: document.getElementById('theme-toggle'),
+        resumeBanner: document.getElementById('resume-banner')
     };
 
     function shuffle(arr) {
@@ -156,6 +271,8 @@
         el.quizContainer.hidden = true;
         el.stats.hidden = true;
         el.subtitle.textContent = t('setup.subtitlePrompt');
+
+        renderResumeBanner();
 
         if (!SETS.length) {
             el.setList.innerHTML = `<p class="setup-empty">${esc(t('setup.empty'))}</p>`;
@@ -210,6 +327,60 @@
         el.startBtn.disabled = total === 0;
     }
 
+    function setNamesLabel(ids) {
+        return ids
+            .map((id) => SETS.find((s) => s.id === id))
+            .filter(Boolean)
+            .map((s) => I18N.localizedSet(s).name)
+            .join(' + ');
+    }
+
+    function renderResumeBanner() {
+        if (!el.resumeBanner) return;
+        const snap = loadProgress();
+        if (!snap) {
+            el.resumeBanner.hidden = true;
+            el.resumeBanner.innerHTML = '';
+            return;
+        }
+        const summary = progressSummary(snap);
+        const names = setNamesLabel(snap.selectedSets);
+        el.resumeBanner.hidden = false;
+        el.resumeBanner.innerHTML = `
+            <div class="resume-info">
+                <div class="resume-title">${esc(t('setup.resumeTitle'))}</div>
+                <div class="resume-meta">${esc(
+                    t('setup.resumeMeta', {
+                        names: names,
+                        answered: summary.answered,
+                        total: summary.total
+                    })
+                )}</div>
+            </div>
+            <div class="resume-actions">
+                <button type="button" class="primary" id="resume-btn">${esc(t('setup.resumeBtn'))}</button>
+                <button type="button" id="discard-btn">${esc(t('setup.discardBtn'))}</button>
+            </div>
+        `;
+        const resumeBtn = document.getElementById('resume-btn');
+        const discardBtn = document.getElementById('discard-btn');
+        if (resumeBtn) {
+            resumeBtn.addEventListener('click', () => {
+                if (!resumeFromSavedProgress()) {
+                    // Saved state became invalid since we rendered the banner.
+                    renderResumeBanner();
+                }
+            });
+        }
+        if (discardBtn) {
+            discardBtn.addEventListener('click', () => {
+                if (!confirm(t('setup.discardConfirm'))) return;
+                clearProgress();
+                renderResumeBanner();
+            });
+        }
+    }
+
     // ---------- Quiz view ----------
 
     function buildBank(selectedIds) {
@@ -250,6 +421,35 @@
 
         updateQuizSubtitle();
         render();
+        saveProgress();
+    }
+
+    // Restore an in-progress quiz from localStorage, if valid, and switch to
+    // the quiz view. Returns true on success.
+    function resumeFromSavedProgress() {
+        const snap = loadProgress();
+        if (!snap) return false;
+
+        state.selectedSets = snap.selectedSets.slice();
+        saveSelection(state.selectedSets);
+        state.mode = snap.mode;
+        QUESTIONS = buildBank(state.selectedSets);
+        state.order = snap.order.slice();
+        state.answers = snap.answers.map((a) =>
+            a ? { picked: a.picked, correct: !!a.correct } : null
+        );
+        state.pos = snap.pos;
+        state.view = 'quiz';
+
+        el.setupArea.hidden = true;
+        el.quizContainer.hidden = false;
+        el.stats.hidden = false;
+        el.modeSeq.classList.toggle('active', state.mode === 'seq');
+        el.modeRand.classList.toggle('active', state.mode === 'rand');
+
+        updateQuizSubtitle();
+        render();
+        return true;
     }
 
     function updateQuizSubtitle() {
@@ -349,6 +549,7 @@
                 if (state.answers[qIdx]) return;
                 const picked = parseInt(btn.dataset.i, 10);
                 state.answers[qIdx] = { picked, correct: picked === q.a };
+                saveProgress();
                 render();
                 renderGrid();
             });
@@ -359,12 +560,14 @@
         if (prev) {
             prev.addEventListener('click', () => {
                 state.pos = Math.max(0, state.pos - 1);
+                saveProgress();
                 render();
             });
         }
         if (next) {
             next.addEventListener('click', () => {
                 state.pos = Math.min(total - 1, state.pos + 1);
+                saveProgress();
                 render();
             });
         }
@@ -391,6 +594,7 @@
         el.grid.querySelectorAll('button').forEach((b) => {
             b.addEventListener('click', () => {
                 state.pos = parseInt(b.dataset.pos, 10);
+                saveProgress();
                 render();
             });
         });
@@ -406,6 +610,7 @@
                 ? shuffle(QUESTIONS.map((_, i) => i))
                 : QUESTIONS.map((_, i) => i);
         state.pos = 0;
+        saveProgress();
         render();
     }
 
@@ -444,6 +649,7 @@
             wrongs.includes(i) ? null : a
         );
         state.pos = 0;
+        saveProgress();
         render();
     });
 
@@ -491,7 +697,10 @@
         }
     });
 
-    // Initial render: always show the setup screen (pre-checking last selection).
-    state.selectedSets = loadSelection();
-    renderSetup();
+    // Initial render: if there's a valid in-progress quiz in localStorage,
+    // resume it straight away. Otherwise show the setup screen.
+    if (!resumeFromSavedProgress()) {
+        state.selectedSets = loadSelection();
+        renderSetup();
+    }
 })();
