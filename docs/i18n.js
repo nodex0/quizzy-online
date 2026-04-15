@@ -64,20 +64,7 @@
             'setup.resumeBtn': 'Continuar →',
             'setup.discardBtn': 'Descartar',
             'setup.discardConfirm':
-                '¿Descartar el test en curso?\n\nPerderás las respuestas guardadas.',
-            'leaderboard.title': 'Clasificación',
-            'leaderboard.empty':
-                'Aún no hay resultados. ¡Completa un test para aparecer aquí!',
-            'leaderboard.headerDate': 'Fecha',
-            'leaderboard.headerSets': 'Conjuntos',
-            'leaderboard.headerScore': 'Aciertos',
-            'leaderboard.headerPct': '%',
-            'leaderboard.headerMode': 'Modo',
-            'leaderboard.clear': 'Limpiar',
-            'leaderboard.clearConfirm':
-                '¿Borrar toda la clasificación?\n\nEsta acción no se puede deshacer.',
-            'leaderboard.modeSeq': 'Orden',
-            'leaderboard.modeRand': 'Aleatorio'
+                '¿Descartar el test en curso?\n\nPerderás las respuestas guardadas.'
         },
         eu: {
             title: 'Quizzy Online — OPE Osakidetza',
@@ -123,20 +110,7 @@
             'setup.resumeBtn': 'Jarraitu →',
             'setup.discardBtn': 'Baztertu',
             'setup.discardConfirm':
-                'Martxan dagoen testa baztertu?\n\nGordetako erantzunak galduko dituzu.',
-            'leaderboard.title': 'Sailkapena',
-            'leaderboard.empty':
-                'Oraindik emaitzarik ez. Osatu testa hemen agertzeko!',
-            'leaderboard.headerDate': 'Data',
-            'leaderboard.headerSets': 'Multzoak',
-            'leaderboard.headerScore': 'Asmatuak',
-            'leaderboard.headerPct': '%',
-            'leaderboard.headerMode': 'Modua',
-            'leaderboard.clear': 'Garbitu',
-            'leaderboard.clearConfirm':
-                'Sailkapen osoa ezabatu?\n\nEkintza hau ezin da desegin.',
-            'leaderboard.modeSeq': 'Ordena',
-            'leaderboard.modeRand': 'Ausazkoa'
+                'Martxan dagoen testa baztertu?\n\nGordetako erantzunak galduko dituzu.'
         }
     };
 

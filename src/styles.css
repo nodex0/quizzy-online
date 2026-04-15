@@ -505,72 +505,6 @@ button:disabled {
     flex-wrap: wrap;
 }
 
-/* ---------- Leaderboard ---------- */
-
-#leaderboard-area {
-    margin-top: 16px;
-}
-.leaderboard-card {
-    padding: 18px 20px;
-}
-.leaderboard-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 12px;
-}
-.leaderboard-head .setup-title {
-    margin: 0;
-}
-.leaderboard-clear {
-    font-size: 12px;
-    padding: 5px 10px;
-}
-.leaderboard-scroll {
-    overflow-x: auto;
-}
-table.leaderboard {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-}
-table.leaderboard th,
-table.leaderboard td {
-    text-align: left;
-    padding: 8px 10px;
-    border-bottom: 1px solid var(--border);
-    white-space: nowrap;
-}
-table.leaderboard th {
-    font-weight: 600;
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--muted);
-    border-bottom: 1px solid var(--border-strong);
-}
-table.leaderboard tr:last-child td {
-    border-bottom: none;
-}
-table.leaderboard .lb-rank {
-    color: var(--muted);
-    width: 24px;
-}
-table.leaderboard .lb-pct b {
-    color: var(--accent);
-}
-table.leaderboard .lb-sets {
-    max-width: 200px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-table.leaderboard .lb-date,
-table.leaderboard .lb-mode {
-    color: var(--muted);
-}
-
 @media (max-width: 520px) {
     h1 {
         font-size: 19px;
@@ -593,12 +527,5 @@ table.leaderboard .lb-mode {
     }
     .resume-actions button {
         flex: 1 1 auto;
-    }
-    table.leaderboard th,
-    table.leaderboard td {
-        padding: 6px 8px;
-    }
-    table.leaderboard .lb-sets {
-        max-width: 110px;
     }
 }

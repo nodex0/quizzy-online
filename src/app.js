@@ -9,8 +9,6 @@
     const SELECTION_KEY = 'quizzy_selected_sets_v1';
     const THEME_KEY = 'celador_theme';
     const PROGRESS_KEY = 'quizzy_progress_v1';
-    const LEADERBOARD_KEY = 'quizzy_leaderboard_v1';
-    const LEADERBOARD_MAX = 20;
 
     function loadSelection() {
         try {
@@ -51,8 +49,6 @@
                 answers: state.answers.map((a) =>
                     a ? { picked: a.picked, correct: !!a.correct } : null
                 ),
-                recorded: !!state.recorded,
-                startedAt: state.startedAt || Date.now(),
                 updatedAt: Date.now()
             };
             localStorage.setItem(PROGRESS_KEY, JSON.stringify(snapshot));
@@ -149,76 +145,6 @@
         };
     }
 
-    // ---------- Leaderboard ----------
-
-    function loadLeaderboard() {
-        try {
-            const raw = localStorage.getItem(LEADERBOARD_KEY);
-            if (!raw) return [];
-            const parsed = JSON.parse(raw);
-            if (!Array.isArray(parsed)) return [];
-            return parsed.filter(
-                (e) =>
-                    e && typeof e === 'object' && typeof e.percent === 'number'
-            );
-        } catch {
-            return [];
-        }
-    }
-
-    function saveLeaderboard(entries) {
-        try {
-            localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(entries));
-        } catch {
-            /* ignore */
-        }
-    }
-
-    function addLeaderboardEntry(entry) {
-        const entries = loadLeaderboard();
-        entries.push(entry);
-        // Sort best-first: percent desc, correct desc, duration asc, date desc.
-        entries.sort((a, b) => {
-            if (b.percent !== a.percent) return b.percent - a.percent;
-            if ((b.correct || 0) !== (a.correct || 0))
-                return (b.correct || 0) - (a.correct || 0);
-            if ((a.durationMs || 0) !== (b.durationMs || 0))
-                return (a.durationMs || 0) - (b.durationMs || 0);
-            return (b.date || 0) - (a.date || 0);
-        });
-        saveLeaderboard(entries.slice(0, LEADERBOARD_MAX));
-    }
-
-    function clearLeaderboard() {
-        try {
-            localStorage.removeItem(LEADERBOARD_KEY);
-        } catch {
-            /* ignore */
-        }
-    }
-
-    function formatDate(ts) {
-        try {
-            return new Intl.DateTimeFormat(I18N.getLang(), {
-                dateStyle: 'short',
-                timeStyle: 'short'
-            }).format(new Date(ts));
-        } catch {
-            return new Date(ts).toLocaleString();
-        }
-    }
-
-    function formatDuration(ms) {
-        if (!ms || ms < 0) return '';
-        const s = Math.floor(ms / 1000);
-        const h = Math.floor(s / 3600);
-        const m = Math.floor((s % 3600) / 60);
-        const sec = s % 60;
-        if (h > 0) return `${h}h ${m}m`;
-        if (m > 0) return `${m}m ${sec}s`;
-        return `${sec}s`;
-    }
-
     // ---------- Theme ----------
 
     function currentTheme() {
@@ -286,9 +212,7 @@
         answers: [],
         mode: 'seq',
         view: 'setup', // 'setup' | 'quiz'
-        selectedSets: [],
-        startedAt: 0,
-        recorded: false
+        selectedSets: []
     };
 
     const el = {
@@ -313,8 +237,7 @@
         restart: document.getElementById('restart'),
         review: document.getElementById('review'),
         themeToggle: document.getElementById('theme-toggle'),
-        resumeBanner: document.getElementById('resume-banner'),
-        leaderboardArea: document.getElementById('leaderboard-area')
+        resumeBanner: document.getElementById('resume-banner')
     };
 
     function shuffle(arr) {
@@ -350,7 +273,6 @@
         el.subtitle.textContent = t('setup.subtitlePrompt');
 
         renderResumeBanner();
-        renderLeaderboard();
 
         if (!SETS.length) {
             el.setList.innerHTML = `<p class="setup-empty">${esc(t('setup.empty'))}</p>`;
@@ -459,71 +381,6 @@
         }
     }
 
-    function renderLeaderboard() {
-        if (!el.leaderboardArea) return;
-        const entries = loadLeaderboard();
-        if (!entries.length) {
-            el.leaderboardArea.innerHTML = `
-                <div class="card leaderboard-card">
-                    <h2 class="setup-title">${esc(t('leaderboard.title'))}</h2>
-                    <p class="setup-empty">${esc(t('leaderboard.empty'))}</p>
-                </div>
-            `;
-            return;
-        }
-        const rows = entries
-            .map((e, i) => {
-                const names = setNamesLabel(e.selectedSets || []);
-                const modeLabel =
-                    e.mode === 'rand'
-                        ? t('leaderboard.modeRand')
-                        : t('leaderboard.modeSeq');
-                const dur = formatDuration(e.durationMs);
-                return `
-                    <tr>
-                        <td class="lb-rank">${i + 1}</td>
-                        <td class="lb-pct"><b>${e.percent}%</b></td>
-                        <td class="lb-score">${e.correct}/${e.total}</td>
-                        <td class="lb-sets" title="${esc(names)}">${esc(names)}</td>
-                        <td class="lb-mode">${esc(modeLabel)}${dur ? ` · ${esc(dur)}` : ''}</td>
-                        <td class="lb-date">${esc(formatDate(e.date))}</td>
-                    </tr>
-                `;
-            })
-            .join('');
-        el.leaderboardArea.innerHTML = `
-            <div class="card leaderboard-card">
-                <div class="leaderboard-head">
-                    <h2 class="setup-title">${esc(t('leaderboard.title'))}</h2>
-                    <button type="button" id="leaderboard-clear" class="leaderboard-clear">${esc(t('leaderboard.clear'))}</button>
-                </div>
-                <div class="leaderboard-scroll">
-                    <table class="leaderboard">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>${esc(t('leaderboard.headerPct'))}</th>
-                                <th>${esc(t('leaderboard.headerScore'))}</th>
-                                <th>${esc(t('leaderboard.headerSets'))}</th>
-                                <th>${esc(t('leaderboard.headerMode'))}</th>
-                                <th>${esc(t('leaderboard.headerDate'))}</th>
-                            </tr>
-                        </thead>
-                        <tbody>${rows}</tbody>
-                    </table>
-                </div>
-            </div>
-        `;
-        const clearBtn = document.getElementById('leaderboard-clear');
-        if (clearBtn) {
-            clearBtn.addEventListener('click', () => {
-                if (!confirm(t('leaderboard.clearConfirm'))) return;
-                clearLeaderboard();
-                renderLeaderboard();
-            });
-        }
-    }
-
     // ---------- Quiz view ----------
 
     function buildBank(selectedIds) {
@@ -557,8 +414,6 @@
         state.answers = new Array(QUESTIONS.length).fill(null);
         state.pos = 0;
         state.view = 'quiz';
-        state.recorded = false;
-        state.startedAt = Date.now();
 
         el.setupArea.hidden = true;
         el.quizContainer.hidden = false;
@@ -584,8 +439,6 @@
             a ? { picked: a.picked, correct: !!a.correct } : null
         );
         state.pos = snap.pos;
-        state.recorded = !!snap.recorded;
-        state.startedAt = snap.startedAt || Date.now();
         state.view = 'quiz';
 
         el.setupArea.hidden = true;
@@ -597,31 +450,6 @@
         updateQuizSubtitle();
         render();
         return true;
-    }
-
-    // Check whether the quiz is fully complete and, if so, record it once.
-    function maybeRecordCompletion() {
-        if (state.recorded) return;
-        if (!state.answers.length) return;
-        if (!state.answers.every((a) => a !== null)) return;
-
-        const correct = state.answers.filter((a) => a && a.correct).length;
-        const wrong = state.answers.filter((a) => a && !a.correct).length;
-        const total = state.answers.length;
-        const ans = correct + wrong;
-        const percent = ans ? Math.round((correct / ans) * 100) : 0;
-
-        addLeaderboardEntry({
-            date: Date.now(),
-            selectedSets: state.selectedSets.slice(),
-            mode: state.mode,
-            total,
-            correct,
-            wrong,
-            percent,
-            durationMs: state.startedAt ? Date.now() - state.startedAt : 0
-        });
-        state.recorded = true;
     }
 
     function updateQuizSubtitle() {
@@ -721,7 +549,6 @@
                 if (state.answers[qIdx]) return;
                 const picked = parseInt(btn.dataset.i, 10);
                 state.answers[qIdx] = { picked, correct: picked === q.a };
-                maybeRecordCompletion();
                 saveProgress();
                 render();
                 renderGrid();
