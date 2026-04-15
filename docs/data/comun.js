@@ -6,7 +6,7 @@
 // The `a` (answer index) is shared across languages — answers never translate.
 (window.QUESTION_SETS = window.QUESTION_SETS || []).push({
   id: "comun",
-  name: "Parte común",
+  name: "Común de categoría C2, C3, D y E",
   description: "OPE Osakidetza · Temario Común · 300 preguntas",
   translations: {
     eu: {

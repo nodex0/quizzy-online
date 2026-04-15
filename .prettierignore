@@ -3,3 +3,4 @@ node_modules/
 package-lock.json
 src/data/celador.js
 src/data/comun.js
+src/data/auxiliar_admin.js
