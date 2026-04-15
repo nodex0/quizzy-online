@@ -2,4 +2,4 @@ docs/
 node_modules/
 package-lock.json
 src/data/celador.js
-src/data/common.js
+src/data/comun.js

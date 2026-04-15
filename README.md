@@ -12,9 +12,9 @@ test — and combined (e.g. run _común_ + _celador_ as a single quiz):
 
 - [`src/data/celador.js`](src/data/celador.js) — **Celador/a OPE Osakidetza**
   (parte específica, 200 preguntas).
-- [`src/data/common.js`](src/data/common.js) — **Parte común** (plantilla:
-  Constitución, Estatuto, Ley de Sanidad, LOPDGDD…). Edítala in-app o añade
-  más entradas directamente al array.
+- [`src/data/comun.js`](src/data/comun.js) — **Parte común** (OPE Osakidetza
+  Temario Común, 300 preguntas). Las respuestas correctas se fijan en la
+  app con el botón ✏️.
 
 Each file registers itself into `window.QUESTION_SETS`. To add a new set,
 create another `src/data/<id>.js` file following the same shape and add a
@@ -112,7 +112,7 @@ src/                   # single source of truth (edit here)
 ├── styles.css
 ├── app.js             # quiz logic (set selection + quiz)
 ├── data/
-│   ├── common.js      # parte común — template
+│   ├── comun.js       # parte común — 300 preguntas (Temario Común)
 │   └── celador.js     # Celador/a parte específica — 200 preguntas
 └── favicon.ico
 docs/                  # generated mirror of src/ for GitHub Pages

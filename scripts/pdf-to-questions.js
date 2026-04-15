@@ -16,6 +16,10 @@
 //   --out <path>           Output .js file (default: src/data/<id>.js).
 //   --force                Overwrite the output file if it already exists.
 //   --print                Print to stdout instead of writing a file.
+//   --raw                  Use pdftotext's -raw mode instead of -layout.
+//                          Needed for PDFs whose columns break around
+//                          option labels (the default -layout floats
+//                          `a) b) c) d)` into a separate column).
 //
 // Requires `pdftotext` (poppler-utils) on PATH.
 //   Ubuntu/Debian: sudo apt-get install poppler-utils
@@ -39,6 +43,8 @@ function parseArgs(argv) {
             args.force = true;
         } else if (a === '--print') {
             args.print = true;
+        } else if (a === '--raw') {
+            args.raw = true;
         } else if (a.startsWith('--')) {
             const key = a.slice(2);
             const val = argv[i + 1];
@@ -67,6 +73,7 @@ function usage() {
             '  --out <path>           Output .js file (default: src/data/<id>.js).',
             '  --force                Overwrite the output file if it exists.',
             '  --print                Print the generated file to stdout.',
+            '  --raw                  Use pdftotext -raw (for column-break PDFs).',
             ''
         ].join('\n')
     );
@@ -89,11 +96,12 @@ function slug(s) {
         .replace(/_+/g, '_');
 }
 
-function runPdftotext(pdfPath) {
+function runPdftotext(pdfPath, { raw = false } = {}) {
+    const mode = raw ? '-raw' : '-layout';
     try {
         return execFileSync(
             'pdftotext',
-            ['-layout', '-enc', 'UTF-8', pdfPath, '-'],
+            [mode, '-enc', 'UTF-8', pdfPath, '-'],
             {
                 encoding: 'utf8',
                 maxBuffer: 64 * 1024 * 1024
@@ -115,8 +123,9 @@ function runPdftotext(pdfPath) {
 
 // ---------- Parser ----------
 
-// Match a question header like "   12.-   Texto…".
-const QUESTION_RE = /^\s*(\d+)\.-\s+(.*\S)\s*$/;
+// Match a question header like "   12.-   Texto…". The dot is optional to
+// tolerate typos like "195-" instead of "195.-".
+const QUESTION_RE = /^\s*(\d+)\.?-\s+(.*\S)\s*$/;
 // Match an option header like "a)   Texto…", "c)  Texto", or bare "d)" with
 // the text wrapping onto the next line.
 const OPTION_RE = /^\s*([abcd])\)\s*(.*)$/;
@@ -297,7 +306,7 @@ function main() {
     const description = args.description || '';
     const outPath = args.out || path.join('src', 'data', `${id}.js`);
 
-    const text = runPdftotext(pdfPath);
+    const text = runPdftotext(pdfPath, { raw: !!args.raw });
     const questions = parseQuestions(text);
 
     if (!questions.length) die('No questions were parsed from the PDF.');
