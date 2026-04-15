@@ -3,7 +3,29 @@
 
     const INITIAL_QUESTIONS = window.INITIAL_QUESTIONS || [];
     const STORAGE_KEY = 'celador_questions_v2';
+    const THEME_KEY = 'celador_theme';
     const LETTERS = ['a', 'b', 'c', 'd'];
+
+    function currentTheme() {
+        return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+    }
+
+    function updateThemeButton() {
+        const btn = document.getElementById('theme-toggle');
+        if (!btn) return;
+        const isDark = currentTheme() === 'dark';
+        btn.textContent = isDark ? '☀️' : '🌙';
+        btn.title = isDark ? 'Tema claro' : 'Tema oscuro';
+        btn.setAttribute('aria-label', btn.title);
+    }
+
+    function setTheme(theme, persist) {
+        document.documentElement.setAttribute('data-theme', theme);
+        if (persist) {
+            try { localStorage.setItem(THEME_KEY, theme); } catch { /* ignore */ }
+        }
+        updateThemeButton();
+    }
 
     function loadQuestions() {
         try {
@@ -60,7 +82,8 @@
         modeSeq: document.getElementById('mode-seq'),
         modeRand: document.getElementById('mode-rand'),
         restart: document.getElementById('restart'),
-        review: document.getElementById('review')
+        review: document.getElementById('review'),
+        themeToggle: document.getElementById('theme-toggle')
     };
 
     function shuffle(arr) {
@@ -297,6 +320,26 @@
         state.editing = false;
         render();
     });
+
+    updateThemeButton();
+    if (el.themeToggle) {
+        el.themeToggle.addEventListener('click', () => {
+            setTheme(currentTheme() === 'dark' ? 'light' : 'dark', true);
+        });
+    }
+
+    if (window.matchMedia) {
+        const mq = window.matchMedia('(prefers-color-scheme: dark)');
+        const onChange = (e) => {
+            let stored = null;
+            try { stored = localStorage.getItem(THEME_KEY); } catch { /* ignore */ }
+            if (stored !== 'light' && stored !== 'dark') {
+                setTheme(e.matches ? 'dark' : 'light', false);
+            }
+        };
+        if (mq.addEventListener) mq.addEventListener('change', onChange);
+        else if (mq.addListener) mq.addListener(onChange);
+    }
 
     el.review.addEventListener('click', () => {
         const wrongs = state.order.filter(
