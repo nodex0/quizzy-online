@@ -1,0 +1,30 @@
+# Cloudflare Pages configuration.
+#
+# This file is picked up when deploying via `wrangler pages deploy` or when
+# the Pages project is configured to read it (Settings → Build → "Use
+# wrangler.toml"). Everything here can also be set in the Pages dashboard.
+#
+# See: https://developers.cloudflare.com/pages/functions/wrangler-configuration/
+
+name = "quizzy-online"
+pages_build_output_dir = "./src"
+compatibility_date = "2024-11-06"
+
+# Non-secret vars shared by all Pages Functions. Production values may be
+# overridden in the Pages dashboard under Settings → Environment variables.
+[vars]
+RATE_LIMIT_WINDOW_SEC = "3600"
+RATE_LIMIT_MAX_POSTS = "5"
+IP_REDACT_AFTER_DAYS = "180"
+SPAM_DELETE_AFTER_DAYS = "30"
+
+# D1 binding.
+[[d1_databases]]
+binding = "DB"
+database_name = "quizzy-comments"
+database_id = "f4671763-58fd-424f-83ad-1f38daca65f5"
+
+# Secrets (set via `wrangler pages secret put <NAME>` or the Pages dashboard):
+#   ADMIN_PASSWORD         — password for the admin panel
+#   ADMIN_SESSION_SECRET   — random 32+ char string, signs session cookies
+#   TURNSTILE_SECRET_KEY   — Cloudflare Turnstile secret key

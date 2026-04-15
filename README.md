@@ -62,6 +62,12 @@ This writes `src/data/auxiliar-admin.js`. Then add
 - Light/dark mode with system-preference detection.
 - Full reset of the current quiz.
 - Multilanguage UI (Español / Euskera) with browser-language detection.
+- **Community comments & flagging** (optional): users can comment on any
+  question or flag it as wrong. Backed by Cloudflare Pages Functions + D1
+  on the same Pages project, Turnstile-protected, with a built-in admin
+  panel at `/admin`. See [`BACKEND.md`](BACKEND.md) for setup. The feature
+  is inert until `window.QUIZZY_CONFIG.turnstileSiteKey` is set in
+  [`src/index.html`](src/index.html).
 
 ## Multilanguage
 
@@ -113,53 +119,74 @@ Or just open `src/index.html` directly in a browser — no build needed.
 
 ## Deploy
 
-Pushed to `main` → deployed to GitHub Pages automatically via
-[`.github/workflows/pages.yml`](.github/workflows/pages.yml). The workflow
-mirrors `src/` into `docs/` (via `scripts/build.js`, which also drops a
-`.nojekyll` marker) and uploads `docs/` as the Pages artifact.
+The site is deployed to **Cloudflare Pages**, which serves the contents of
+`src/` directly — there is no build step. Cloudflare Pages works with
+**private GitHub repos** on its free tier, so the repository does not need
+to be public.
 
-`docs/` is committed so either Pages source works:
+### One-time setup
 
-- **Source: GitHub Actions** (recommended) — the workflow above handles it.
-- **Source: Deploy from a branch → `main` /docs** — reads the committed
-  `docs/` tree. `.nojekyll` short-circuits the Jekyll build so the
-  `github-pages` gem doesn't choke on `jekyll-sass-converter`.
+1. Push this repo to GitHub (public or private).
+2. Cloudflare dashboard → **Workers & Pages** → **Create application** →
+   **Pages** → **Connect to Git**. Pick the repo.
+3. Build settings:
+   - **Production branch:** `main`
+   - **Framework preset:** None
+   - **Build command:** _(leave empty)_
+   - **Build output directory:** `src`
+   - **Root directory:** _(leave empty)_
+4. Save and deploy. Cloudflare assigns a default URL of the form
+   `https://<project-name>.pages.dev`.
 
-If you edit the app under `src/`, re-sync with `npm run build` and commit
-the regenerated `docs/`.
+That's it — every push to `main` triggers a new deploy. Branch pushes get
+preview deploys at `https://<branch>.<project-name>.pages.dev`.
 
-### Local Jekyll build (optional)
+### Alternative: CLI deploy
 
-A `Gemfile` is provided for anyone who wants to reproduce the GitHub Pages
-build locally. It pins `github-pages` and explicitly depends on
-`faraday-retry` so `jekyll-github-metadata` can use retry middleware with
-Faraday v2.0+ without warnings.
+If you prefer to deploy from your machine instead of Git integration:
 
 ```bash
-bundle install
-bundle exec jekyll build
+npx wrangler pages deploy src --project-name quizzy-online
 ```
+
+### Custom domain
+
+Cloudflare dashboard → **Workers & Pages** → your project → **Custom
+domains** → **Set up a custom domain**. Cloudflare handles TLS automatically.
+
+### Comments backend
+
+The commenting / flagging feature runs as **Pages Functions** (in
+[`functions/`](functions/)) deployed alongside the static site — same
+Cloudflare Pages project, same origin, no separate Worker. You need to
+create a D1 database, load the schema, set three secrets, and add the
+Turnstile site key to `src/index.html`. Full walkthrough:
+[`BACKEND.md`](BACKEND.md).
 
 ## Layout
 
 ```
-src/                   # single source of truth (edit here)
+src/                   # static site — deployed to Pages as-is
 ├── index.html
 ├── styles.css
 ├── app.js             # quiz logic (set selection + quiz)
+├── i18n.js            # translations table + runtime localization
+├── comments.js        # comments & flagging client (no-op until configured)
+├── _headers           # Cloudflare Pages security headers
 ├── data/
-│   ├── comun.js       # parte común — 300 preguntas (Temario Común)
-│   └── celador.js     # Celador/a parte específica — 200 preguntas
+│   ├── comun.js           # parte común — 300 preguntas (Temario Común)
+│   ├── celador.js         # Celador/a parte específica — 200 preguntas
+│   └── auxiliar_admin.js  # Auxiliar Administrativo/a — parte específica
 └── favicon.ico
-docs/                  # generated mirror of src/ for GitHub Pages
-├── .nojekyll          # disables Jekyll on the Pages build
-└── ... (mirror of src/)
+functions/             # Pages Functions — comments + admin API
+├── comments.js        # GET + POST /comments
+├── admin/             # /admin panel + /admin/api/*
+└── _lib/              # shared helpers (HMAC auth, Turnstile, utils, HTML)
+wrangler.toml          # Pages config + D1 binding (pages_build_output_dir=src)
+schema.sql             # D1 schema, applied with `wrangler d1 execute`
+BACKEND.md             # backend setup guide
+PRIVACY.md             # privacy-notice template (Spain/GDPR)
 scripts/
-├── build.js           # mirrors src/ → docs/
 ├── server.js          # Express static server (local preview)
 └── pdf-to-questions.js # PDF → question-set extractor (npm run pdf)
-.github/workflows/
-└── pages.yml          # Pages auto-deploy
-Gemfile                # github-pages + faraday-retry (local Jekyll dev)
-_config.yml            # minimal Jekyll config (legacy Pages safety net)
 ```
