@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Quizzy">
+    <title>Quizzy</title>
+    <rect width="64" height="64" rx="14" ry="14" fill="#185fa5"/>
+    <!-- Stylised "Q": a circle whose tail flicks out as a checkmark,
+         tying the Quizzy brand letter to the idea of a correct answer. -->
+    <circle cx="27" cy="27" r="13" fill="none" stroke="#ffffff" stroke-width="6"/>
+    <path d="M33 35 L42 44 L56 28"
+          fill="none"
+          stroke="#ffffff"
+          stroke-width="6"
+          stroke-linecap="round"
+          stroke-linejoin="round"/>
+</svg>
