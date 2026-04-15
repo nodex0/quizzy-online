@@ -1,62 +1,121 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Celador/a Osakidetza — Test de 200 preguntas</title>
-    <link rel="shortcut icon" href="./favicon.ico">
-    <link rel="stylesheet" href="./styles.css">
-    <script>
-        (function () {
-            try {
-                var t = localStorage.getItem('celador_theme');
-                if (t !== 'light' && t !== 'dark') {
-                    t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Quizzy Online — OPE Osakidetza</title>
+        <link rel="shortcut icon" href="./favicon.ico" />
+        <link rel="stylesheet" href="./styles.css" />
+        <script>
+            (function () {
+                try {
+                    var t = localStorage.getItem('celador_theme');
+                    if (t !== 'light' && t !== 'dark') {
+                        t =
+                            window.matchMedia &&
+                            window.matchMedia('(prefers-color-scheme: dark)')
+                                .matches
+                                ? 'dark'
+                                : 'light';
+                    }
+                    document.documentElement.setAttribute('data-theme', t);
+                } catch (e) {
+                    /* ignore */
                 }
-                document.documentElement.setAttribute('data-theme', t);
-            } catch (e) { /* ignore */ }
-        })();
-    </script>
-</head>
-<body>
-    <div class="wrap">
-        <header>
-            <div>
-                <h1>Celador/a — OPE Osakidetza</h1>
-                <p class="subtitle">Test de práctica · 200 preguntas</p>
-            </div>
-            <div class="stats">
-                <div class="stat">Pregunta<b><span id="current">1</span>/<span id="total">200</span></b></div>
-                <div class="stat">Aciertos<b id="correct">0</b></div>
-                <div class="stat">Fallos<b id="wrong">0</b></div>
-                <div class="stat">% acierto<b id="pct">—</b></div>
-            </div>
-        </header>
+            })();
+        </script>
+    </head>
+    <body>
+        <div class="wrap">
+            <header>
+                <div>
+                    <h1>Quizzy — OPE Osakidetza</h1>
+                    <p class="subtitle" id="subtitle">Test de práctica</p>
+                </div>
+                <div class="stats" id="stats" hidden>
+                    <div class="stat">
+                        Pregunta<b
+                            ><span id="current">1</span>/<span id="total"
+                                >0</span
+                            ></b
+                        >
+                    </div>
+                    <div class="stat">Aciertos<b id="correct">0</b></div>
+                    <div class="stat">Fallos<b id="wrong">0</b></div>
+                    <div class="stat">% acierto<b id="pct">—</b></div>
+                </div>
+            </header>
 
-        <div class="notice">✏️ Puedes editar cualquier pregunta o respuesta pulsando el botón <b>Editar</b>. Tus cambios se guardan automáticamente en este navegador. Pulsa <b>Reiniciar</b> para volver al conjunto original.</div>
-
-        <div class="controls">
-            <div class="mode-toggle">
-                <button id="mode-seq" class="active">Orden</button>
-                <button id="mode-rand">Aleatorio</button>
+            <div class="controls setup-controls">
+                <span class="spacer"></span>
+                <button
+                    id="theme-toggle"
+                    type="button"
+                    aria-label="Cambiar tema"
+                    title="Cambiar tema"
+                >
+                    🌙
+                </button>
             </div>
-            <button id="restart">↻ Reiniciar</button>
-            <button id="review" disabled>Ver fallos</button>
-            <span class="spacer"></span>
-            <button id="theme-toggle" type="button" aria-label="Cambiar tema" title="Cambiar tema">🌙</button>
+
+            <div id="setup-area">
+                <div class="card">
+                    <h2 class="setup-title">
+                        Elige los conjuntos de preguntas
+                    </h2>
+                    <p class="setup-help">
+                        Puedes seleccionar uno o varios. Al marcar varios, las
+                        preguntas se combinan en un solo test.
+                    </p>
+                    <div id="set-list" class="set-list"></div>
+                    <div class="nav">
+                        <span id="setup-total" class="setup-total"
+                            >0 preguntas seleccionadas</span
+                        >
+                        <button id="start-btn" class="primary" disabled>
+                            Empezar →
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="quiz-container" hidden>
+                <div class="notice">
+                    ✏️ Puedes editar cualquier pregunta o respuesta pulsando el
+                    botón <b>Editar</b>. Tus cambios se guardan automáticamente
+                    en este navegador. Pulsa <b>Reiniciar</b> para volver al
+                    conjunto original.
+                </div>
+
+                <div class="controls">
+                    <div class="mode-toggle">
+                        <button id="mode-seq" class="active">Orden</button>
+                        <button id="mode-rand">Aleatorio</button>
+                    </div>
+                    <button id="change-sets">← Cambiar conjuntos</button>
+                    <button id="restart">↻ Reiniciar</button>
+                    <button id="review" disabled>Ver fallos</button>
+                </div>
+
+                <div class="progress">
+                    <div
+                        class="progress-bar"
+                        id="bar"
+                        style="width: 0.5%"
+                    ></div>
+                </div>
+
+                <div id="quiz-area"></div>
+
+                <details class="jumper">
+                    <summary>Ir a pregunta…</summary>
+                    <div class="grid" id="grid"></div>
+                </details>
+            </div>
         </div>
 
-        <div class="progress"><div class="progress-bar" id="bar" style="width:0.5%"></div></div>
-
-        <div id="quiz-area"></div>
-
-        <details class="jumper">
-            <summary>Ir a pregunta…</summary>
-            <div class="grid" id="grid"></div>
-        </details>
-    </div>
-
-    <script src="./data/questions.js"></script>
-    <script src="./app.js"></script>
-</body>
+        <script src="./data/common.js"></script>
+        <script src="./data/celador.js"></script>
+        <script src="./app.js"></script>
+    </body>
 </html>
