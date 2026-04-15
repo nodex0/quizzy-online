@@ -123,80 +123,150 @@ function runPdftotext(pdfPath, { raw = false } = {}) {
 
 // ---------- Parser ----------
 
-// Match a question header like "   12.-   Texto…". The dot is optional to
-// tolerate typos like "195-" instead of "195.-".
-const QUESTION_RE = /^\s*(\d+)\.?-\s+(.*\S)\s*$/;
+// Match a question header. Stem on the same line is optional — column-broken
+// PDFs sometimes emit a bare "124.-" with the stem floating below the labels.
+// The dot is optional to tolerate typos like "195-" instead of "195.-".
+const QUESTION_RE = /^\s*(\d+)\.?-(?:\s+(.*\S))?\s*$/;
 // Match an option header like "a)   Texto…", "c)  Texto", or bare "d)" with
 // the text wrapping onto the next line.
 const OPTION_RE = /^\s*([abcd])\)\s*(.*)$/;
 // Lines we want to drop outright (page headers/footers, running titles).
 // Keep this conservative — we only skip things that cannot be actual content.
 const NOISE_RE =
-    /^\s*(CELADOR\/?A?|PREGUNTAS|Página\s+\d+|P[áa]gina\s+\d+\s*\/\s*\d+|\d+\s*\/\s*\d+)\s*$/i;
+    /^\s*(CELADOR\/?A?|ZELADOREA|GALDERAK|PREGUNTAS|Página\s+\d+|P[áa]gina\s+\d+\s*\/\s*\d+|\d+\s*\/\s*\d+)\s*$/i;
 
-function parseQuestions(text) {
-    const lines = text.split(/\r?\n/);
-    const questions = [];
-    let current = null;
-    let mode = null; // 'stem' | 'opt'
-    let currentOpt = -1;
+// Sentence-end detector for floating-text paragraph splitting. A line that
+// ends with `.`, `?`, `!` or an ellipsis closes the current paragraph. This
+// works for column-broken option lists where each option is one sentence and
+// gets its own line(s) in the PDF — even when the option text starts with
+// non-letter characters (e.g. "-logia.").
+function endsSentence(line) {
+    return /[.!?…]\s*$/.test(line);
+}
 
-    function finalize() {
-        if (!current) return;
-        if (current.o.length !== 4) {
-            throw new Error(
-                `Question ${current.n} has ${current.o.length} options, expected 4.`
-            );
-        }
-        // Collapse runs of whitespace in each field.
-        current.q = current.q.replace(/\s+/g, ' ').trim();
-        current.o = current.o.map((s) => s.replace(/\s+/g, ' ').trim());
-        questions.push(current);
-        current = null;
-        mode = null;
-        currentOpt = -1;
+// Parse one question block (lines between two N.- markers) into {q, o}.
+// `firstStem` is the inline stem captured from the marker line (may be empty
+// for column-broken PDFs where the stem floats after the labels).
+function parseBlock(n, firstStem, blockLines) {
+    const lines = blockLines
+        .map((l) => l.replace(/\s+$/, ''))
+        .filter((l) => !NOISE_RE.test(l));
+
+    const stemParts = firstStem ? [firstStem] : [];
+    const labels = []; // { idx, inline: string ('' if bare label) }
+    const floating = []; // paragraph strings collected after bare labels
+    let phase = 'stem'; // 'stem' | 'opts'
+    // Index into `labels` of the most-recent inline label whose text we may
+    // still extend with continuation lines. -1 once we leave inline mode
+    // (i.e., the most recent label was bare).
+    let inlineIdx = -1;
+    let curPara = '';
+
+    function flushPara() {
+        const t = curPara.trim();
+        if (t) floating.push(t);
+        curPara = '';
     }
 
     for (const raw of lines) {
-        const line = raw.replace(/\s+$/, '');
-        if (!line.trim()) {
-            // Blank lines separate blocks visually but don't close the question
-            // — the next option/question header will switch modes cleanly.
+        const line = raw.trim();
+        if (!line) {
+            flushPara();
             continue;
         }
-        if (NOISE_RE.test(line)) continue;
-
-        const qm = line.match(QUESTION_RE);
         const om = line.match(OPTION_RE);
-
-        if (qm) {
-            finalize();
-            current = { n: parseInt(qm[1], 10), q: qm[2], o: [] };
-            mode = 'stem';
-            currentOpt = -1;
-        } else if (om) {
-            if (!current) continue;
-            const expected = 'abcd'[current.o.length];
-            if (om[1] !== expected) {
-                throw new Error(
-                    `Question ${current.n}: expected option ${expected}), got ${om[1]}).`
-                );
-            }
-            current.o.push((om[2] || '').trim());
-            mode = 'opt';
-            currentOpt = current.o.length - 1;
+        // Only treat as a label while we still need labels (max 4). After the
+        // 4th label, lines like "b) eta c) erantzunak zuzenak dira." are
+        // option content, not new labels.
+        if (om && labels.length < 4) {
+            flushPara();
+            phase = 'opts';
+            const inline = om[2].trim();
+            labels.push({ idx: 'abcd'.indexOf(om[1]), inline });
+            inlineIdx = inline ? labels.length - 1 : -1;
+            continue;
+        }
+        if (phase === 'stem') {
+            stemParts.push(line);
+            continue;
+        }
+        // phase === 'opts'
+        if (inlineIdx >= 0) {
+            // Continuation wrap of the most recent inline label.
+            labels[inlineIdx].inline += ' ' + line;
         } else {
-            // Continuation of the current stem or option.
-            if (!current) continue;
-            const cont = line.trim();
-            if (mode === 'stem') {
-                current.q += ' ' + cont;
-            } else if (mode === 'opt' && currentOpt >= 0) {
-                current.o[currentOpt] += ' ' + cont;
-            }
+            // Floating text after a bare label: a paragraph closes the
+            // moment its line ends with sentence punctuation.
+            curPara += (curPara ? ' ' : '') + line;
+            if (endsSentence(line)) flushPara();
         }
     }
-    finalize();
+    flushPara();
+
+    if (labels.length !== 4) {
+        throw new Error(
+            `Question ${n}: expected 4 option labels, got ${labels.length}.`
+        );
+    }
+    for (let i = 0; i < 4; i++) {
+        if (labels[i].idx !== i) {
+            throw new Error(
+                `Question ${n}: expected label ${'abcd'[i]}), got ${'abcd'[labels[i].idx]}).`
+            );
+        }
+    }
+
+    const opts = labels.map((l) => l.inline);
+    const bareIndices = labels
+        .map((l, i) => (l.inline ? -1 : i))
+        .filter((x) => x >= 0);
+
+    let stem = stemParts.join(' ').replace(/\s+/g, ' ').trim();
+    let pi = 0;
+    // Column-break case: bare `N.-` AND exactly bareCount + 1 paragraphs;
+    // the first paragraph is the stem, the rest are option texts.
+    if (!stem && bareIndices.length && floating.length === bareIndices.length + 1) {
+        stem = floating[0];
+        pi = 1;
+    }
+    for (const idx of bareIndices) {
+        if (pi >= floating.length) {
+            throw new Error(
+                `Question ${n}: ran out of paragraphs for bare label ${'abcd'[idx]}).`
+            );
+        }
+        opts[idx] = floating[pi++];
+    }
+    while (pi < floating.length) {
+        // Leftover paragraph: append to the last option (rare; happens when
+        // the heuristic over-split an option's text).
+        opts[3] += ' ' + floating[pi++];
+    }
+    return {
+        n,
+        q: stem,
+        o: opts.map((s) => s.replace(/\s+/g, ' ').trim())
+    };
+}
+
+function parseQuestions(text) {
+    const lines = text.split(/\r?\n/).map((l) => l.replace(/\s+$/, ''));
+
+    // First pass: locate question boundaries.
+    const starts = [];
+    for (let i = 0; i < lines.length; i++) {
+        const m = lines[i].match(QUESTION_RE);
+        if (m) starts.push({ i, n: parseInt(m[1], 10), firstStem: m[2] || '' });
+    }
+    if (!starts.length) return [];
+
+    const questions = [];
+    for (let s = 0; s < starts.length; s++) {
+        const start = starts[s];
+        const end = s + 1 < starts.length ? starts[s + 1].i : lines.length;
+        const block = lines.slice(start.i + 1, end);
+        questions.push(parseBlock(start.n, start.firstStem, block));
+    }
 
     // Sanity: question numbers should be contiguous from 1.
     for (let i = 0; i < questions.length; i++) {
