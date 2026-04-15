@@ -303,8 +303,82 @@ button:disabled { opacity: .45; cursor: not-allowed; }
 .edit-opt-row input[type=radio]:checked ~ label.letter,
 .edit-opt-row:has(input:checked) .letter { background: var(--success); color: #fff; }
 
+.setup-title { font-size: 18px; font-weight: 600; margin: 0 0 4px; }
+.setup-help { font-size: 13px; color: var(--muted); margin: 0 0 16px; }
+.setup-empty { font-size: 14px; color: var(--muted); margin: 8px 0; }
+
+.set-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.set-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    cursor: pointer;
+    transition: all .15s;
+}
+.set-item:hover { border-color: var(--border-strong); background: var(--surface-alt); }
+.set-item input[type=checkbox] {
+    flex: 0 0 auto;
+    width: 18px;
+    height: 18px;
+    accent-color: var(--accent);
+    cursor: pointer;
+}
+.set-item:has(input:checked) {
+    border-color: var(--accent);
+    background: var(--accent-bg);
+}
+
+.set-info { flex: 1 1 auto; min-width: 0; }
+.set-name { font-size: 14px; font-weight: 600; color: var(--text); }
+.set-desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+.set-count {
+    flex: 0 0 auto;
+    font-size: 12px;
+    color: var(--muted);
+    background: var(--chip);
+    border-radius: 999px;
+    padding: 3px 10px;
+    white-space: nowrap;
+}
+.set-item:has(input:checked) .set-count {
+    background: var(--accent);
+    color: #fff;
+}
+
+.setup-total {
+    font-size: 13px;
+    color: var(--muted);
+    align-self: center;
+}
+
+.set-tag {
+    display: inline-block;
+    background: var(--chip);
+    color: var(--muted);
+    border-radius: 999px;
+    padding: 1px 8px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: none;
+    margin-left: 4px;
+}
+
 @media (max-width: 520px) {
     h1 { font-size: 19px; }
     .card { padding: 18px 16px; }
     .q-text { font-size: 15px; }
+    .set-item { padding: 10px 12px; }
+    .set-count { font-size: 11px; padding: 2px 8px; }
 }
