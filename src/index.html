@@ -155,10 +155,20 @@
             </div>
         </div>
 
+        <script>
+            // Community comments & flagging. Runs against same-origin Pages
+            // Functions under /comments and /admin. Set `turnstileSiteKey`
+            // from the Cloudflare Turnstile dashboard; leave empty to keep
+            // the feature inert. See BACKEND.md for setup.
+            window.QUIZZY_CONFIG = {
+                turnstileSiteKey: '0x4AAAAAAC-GTfF0O_9lP6_j'
+            };
+        </script>
         <script src="./i18n.js"></script>
         <script src="./data/comun.js"></script>
         <script src="./data/celador.js"></script>
         <script src="./data/auxiliar_admin.js"></script>
+        <script src="./comments.js"></script>
         <script src="./app.js"></script>
     </body>
 </html>

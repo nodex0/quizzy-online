@@ -505,6 +505,202 @@ button:disabled {
     flex-wrap: wrap;
 }
 
+/* ---------- Comments & flagging ---------- */
+
+.comments-host {
+    margin-top: 22px;
+    border-top: 1px solid var(--border);
+    padding-top: 14px;
+}
+
+details.comments {
+    font-size: 14px;
+}
+details.comments > summary {
+    cursor: pointer;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    padding: 6px 0;
+    list-style: none;
+    color: var(--muted);
+    font-size: 13px;
+}
+details.comments > summary::-webkit-details-marker {
+    display: none;
+}
+details.comments > summary::before {
+    content: '▸';
+    font-size: 11px;
+    transition: transform 0.15s;
+    color: var(--muted);
+}
+details.comments[open] > summary::before {
+    transform: rotate(90deg);
+}
+.comments-title {
+    font-weight: 600;
+    color: var(--text);
+}
+.comments-count {
+    color: var(--muted);
+}
+
+.comments-body {
+    padding: 8px 0 4px;
+}
+.comments-loading,
+.comments-empty {
+    color: var(--muted);
+    font-size: 13px;
+    padding: 10px 0;
+    margin: 0;
+}
+
+.comments-list {
+    list-style: none;
+    padding: 0;
+    margin: 6px 0 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.comment {
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+}
+.comment-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    background: var(--chip);
+    color: var(--muted);
+    border-radius: 999px;
+    padding: 2px 8px;
+    margin-bottom: 4px;
+}
+.comment-badge.flag {
+    background: var(--danger-bg);
+    color: var(--danger);
+}
+.comment-meta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 4px;
+}
+.comment-meta b {
+    color: var(--text);
+    font-weight: 600;
+}
+.comment-body {
+    margin: 0;
+    font-size: 14px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    line-height: 1.5;
+}
+
+.comments-add {
+    background: transparent;
+    border: 1px dashed var(--border-strong);
+    color: var(--muted);
+    padding: 8px 14px;
+    border-radius: 8px;
+    width: 100%;
+    font-size: 13px;
+}
+.comments-add:hover {
+    color: var(--text);
+    border-style: solid;
+    background: var(--hover);
+}
+
+.comment-form {
+    margin-top: 6px;
+    padding: 14px;
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+}
+.comment-kind-tabs {
+    display: inline-flex;
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 12px;
+}
+.kind-tab {
+    border: none;
+    border-radius: 0;
+    padding: 6px 12px;
+    background: transparent;
+    font-size: 13px;
+    color: var(--text);
+    cursor: pointer;
+}
+.kind-tab.active {
+    background: var(--accent);
+    color: #fff;
+}
+.comment-label {
+    display: block;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+    margin: 10px 0 4px;
+    font-weight: 600;
+}
+.cf-input {
+    width: 100%;
+    font: inherit;
+    font-size: 14px;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--input-bg);
+    color: var(--text);
+    line-height: 1.45;
+    box-sizing: border-box;
+}
+textarea.cf-input {
+    resize: vertical;
+}
+.cf-input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-focus);
+}
+.flag-reason-row {
+    margin-bottom: 4px;
+}
+.cf-hp {
+    position: absolute !important;
+    left: -9999px !important;
+    width: 1px !important;
+    height: 1px !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+.cf-turnstile {
+    margin: 12px 0;
+    min-height: 65px;
+}
+.cf-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 10px;
+}
+.cf-status {
+    flex: 1;
+    font-size: 12px;
+    color: var(--muted);
+}
+
 @media (max-width: 520px) {
     h1 {
         font-size: 19px;
@@ -527,5 +723,8 @@ button:disabled {
     }
     .resume-actions button {
         flex: 1 1 auto;
+    }
+    .comment-form {
+        padding: 12px;
     }
 }

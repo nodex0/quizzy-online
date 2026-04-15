@@ -541,8 +541,23 @@
                     <button id="prev" ${state.pos === 0 ? 'disabled' : ''}>${esc(t('quiz.prev'))}</button>
                     <button id="next" class="primary" ${state.pos === total - 1 ? 'disabled' : ''}>${esc(t('quiz.next'))}</button>
                 </div>
+                <div id="comments-host" class="comments-host"></div>
             </div>
         `;
+
+        if (window.QuizzyComments && window.QuizzyComments.enabled()) {
+            const host = document.getElementById('comments-host');
+            if (host) {
+                window.QuizzyComments.mount(host, {
+                    setId: rawQ.setId,
+                    questionIdx: rawQ.localIdx,
+                    questionText: q.q,
+                    currentAnswer: q.a,
+                    options: q.o.slice()
+                });
+            }
+        }
+
 
         el.area.querySelectorAll('.opt').forEach((btn) => {
             btn.addEventListener('click', () => {

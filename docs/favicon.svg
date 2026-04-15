@@ -1,9 +1,0 @@
-<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-  <rect x="0" y="0" width="100" height="100" rx="20" ry="20" fill="#0066FF"/>
-
-  <text x="50%" y="55%" font-family="Arial, sans-serif" font-weight="bold" font-size="55" fill="white" text-anchor="middle" dominant-baseline="middle">Q</text>
-
-  <circle cx="80" cy="80" r="15" fill="#0066FF" />
-
-  <path d="M70 80 L77 87 L90 73" stroke="#28A745" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
