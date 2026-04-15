@@ -91,6 +91,9 @@ h1 {
     gap: 8px;
     flex-wrap: wrap;
 }
+.stats[hidden] {
+    display: none;
+}
 .stat {
     background: var(--surface);
     border: 1px solid var(--border);
