@@ -13,14 +13,11 @@ test — and combined (e.g. run _común_ + _celador_ as a single quiz):
 - [`src/data/celador.js`](src/data/celador.js) — **Celador/a OPE Osakidetza**
   (parte específica, 200 preguntas).
 - [`src/data/comun.js`](src/data/comun.js) — **Parte común** (OPE Osakidetza
-  Temario Común, 300 preguntas). Las respuestas correctas se fijan en la
-  app con el botón ✏️.
+  Temario Común, 300 preguntas).
 
 Each file registers itself into `window.QUESTION_SETS`. To add a new set,
 create another `src/data/<id>.js` file following the same shape and add a
 `<script>` tag in [`src/index.html`](src/index.html).
-
-Edits made in the browser persist per-set in `localStorage`.
 
 ## Import a PDF question bank
 
@@ -47,7 +44,8 @@ This writes `src/data/auxiliar-admin.js`. Then add
   stems and `a)`, `b)`, `c)`, `d)` for options. Multi-line wrapping is
   handled.
 - `--answers` is optional; without it every question defaults to option
-  `a` and you can fix them in-app with the ✏️ button.
+  `a`. Use [`scripts/apply-answers.js`](scripts/apply-answers.js) to set
+  them later without re-parsing the PDF.
 - The answer-key format is flexible: `1.b 2.a 3.c`, `1) b`, one letter
   per line, or any mix that includes question numbers with an `a`–`d`
   letter next to them.
@@ -61,9 +59,8 @@ This writes `src/data/auxiliar-admin.js`. Then add
 - Two modes: sequential order or randomized.
 - Jump-to-question grid.
 - "Ver fallos" — review only the questions you got wrong.
-- In-place editor: rewrite any question/option or change the correct answer.
 - Light/dark mode with system-preference detection.
-- Full reset to the original bank (for the currently selected sets).
+- Full reset of the current quiz.
 
 ## Run locally
 

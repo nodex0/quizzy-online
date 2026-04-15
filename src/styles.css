@@ -19,9 +19,6 @@
     --success-bg: #eaf3de;
     --danger: #a32d2d;
     --danger-bg: #fcebeb;
-    --warn-bg: #faeeda;
-    --warn: #854f0b;
-    --warn-border: rgba(133, 79, 11, 0.2);
 }
 
 [data-theme='dark'] {
@@ -45,9 +42,6 @@
     --success-bg: rgba(139, 194, 104, 0.14);
     --danger: #e27878;
     --danger-bg: rgba(226, 120, 120, 0.14);
-    --warn: #e0b060;
-    --warn-bg: rgba(224, 176, 96, 0.12);
-    --warn-border: rgba(224, 176, 96, 0.3);
 }
 
 * {
@@ -350,92 +344,6 @@ button:disabled {
 .summary-label {
     color: var(--muted);
     font-size: 14px;
-}
-
-.notice {
-    background: var(--warn-bg);
-    color: var(--warn);
-    border: 1px solid var(--warn-border);
-    border-radius: 10px;
-    padding: 10px 14px;
-    font-size: 13px;
-    margin-bottom: 16px;
-}
-
-.q-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 6px;
-    gap: 8px;
-}
-.edit-btn {
-    font-size: 12px;
-    padding: 4px 10px;
-    border-radius: 6px;
-    background: transparent;
-    border: 1px solid var(--border);
-}
-.edit-btn:hover {
-    background: var(--hover);
-    border-color: var(--border-strong);
-}
-
-.edit-label {
-    display: block;
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--muted);
-    margin: 14px 0 6px;
-    font-weight: 600;
-}
-.edit-input {
-    width: 100%;
-    font: inherit;
-    font-size: 14px;
-    padding: 10px 12px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    background: var(--input-bg);
-    color: var(--text);
-    resize: vertical;
-    line-height: 1.45;
-    box-sizing: border-box;
-}
-.edit-input:focus {
-    outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-focus);
-}
-.edit-opt-row {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    margin-bottom: 8px;
-}
-.edit-opt-row input[type='radio'] {
-    margin-top: 10px;
-    accent-color: var(--success);
-}
-.edit-opt-row .letter {
-    flex: 0 0 24px;
-    height: 24px;
-    border-radius: 50%;
-    background: var(--chip);
-    color: var(--muted);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    font-weight: 600;
-    margin-top: 6px;
-    cursor: pointer;
-}
-.edit-opt-row input[type='radio']:checked ~ label.letter,
-.edit-opt-row:has(input:checked) .letter {
-    background: var(--success);
-    color: #fff;
 }
 
 .setup-title {
