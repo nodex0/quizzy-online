@@ -1,4 +1,5 @@
 docs/
 node_modules/
 package-lock.json
-src/data/questions.js
+src/data/celador.js
+src/data/common.js

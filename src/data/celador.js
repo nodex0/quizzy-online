@@ -1,6 +1,10 @@
-// Initial question bank for the Celador/a OPE Osakidetza practice test.
+// Celador/a OPE Osakidetza — parte específica.
 // Format per item: { q: String, o: [a,b,c,d], a: Number (0..3 correct index) }
-window.INITIAL_QUESTIONS = [
+(window.QUESTION_SETS = window.QUESTION_SETS || []).push({
+  id: 'celador',
+  name: 'Celador/a — Parte específica',
+  description: 'OPE Osakidetza · 200 preguntas',
+  questions: [
   {q:"En Osakidetza, para todos los tipos de jornada, excepto la nocturna, el trabajo efectivo anual a realizar en concepto de jornada ordinaria será de:",o:["1592 horas.","1433 horas.","1447 horas.","1492 horas."],a:0},
   {q:"Podrá acogerse a la exención de trabajo nocturno el personal mayor de:",o:["60 años.","55 años.","50 años.","62 años."],a:1},
   {q:"Al personal mayor de 60 años que preste sus servicios en régimen de turnos rotatorios se le aplicará a la hora nocturna el factor multiplicador que se señala a continuación:",o:["1,15.","1,25.","1,20.","1,10."],a:2},
@@ -201,4 +205,5 @@ window.INITIAL_QUESTIONS = [
   {q:"Según el Acuerdo Regulador de Osakidetza, ¿cuál es la duración de la licencia retribuida por matrimonio propio?",o:["El personal tiene derecho a una licencia de 20 días naturales de duración que podrá disfrutar con anterioridad o posterioridad a su celebración, incluyendo dicha fecha en ese periodo.","El personal tiene derecho a una licencia de 25 días naturales de duración que podrá disfrutar con anterioridad o posterioridad a su celebración, incluyendo dicha fecha en ese periodo.","El personal tiene derecho a una licencia de 20 días naturales de duración que podrá disfrutar únicamente con posterioridad a su celebración.","El personal tiene derecho a una licencia de 25 días naturales de duración que podrá disfrutar únicamente con posterioridad a su celebración."],a:0},
   {q:"Al tablero destinado a pacientes que precisen de una inmovilización de urgencia, se le denomina:",o:["Tablero de inmovilización espinal.","Tablero de paradas.","Transpaleta eléctrica.","Camilla de exploración."],a:1},
   {q:"El Decreto 255/1997 en su artículo 4 (personalidad jurídica y capacidad de obrar) indica que el Ente Público Osakidetza-Servicio Vasco de Salud:",o:["Actúa con personalidad jurídica privada y capacidad limitada al ámbito sanitario.","Dispone de personalidad jurídica pública diferenciada y plena capacidad de obrar para el cumplimiento de su objeto y fines.","Carece de personalidad jurídica propia y depende orgánicamente del Departamento de Sanidad.","Todas son incorrectas."],a:1}
-];
+  ]
+});
