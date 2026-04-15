@@ -4,53 +4,7 @@
     const SETS = (window.QUESTION_SETS || []).slice();
     const LETTERS = ['a', 'b', 'c', 'd'];
     const SELECTION_KEY = 'quizzy_selected_sets_v1';
-    const SET_STORAGE_PREFIX = 'quizzy_set_';
-    const SET_STORAGE_VERSION = 'v1';
     const THEME_KEY = 'celador_theme';
-
-    function setStorageKey(setId) {
-        return SET_STORAGE_PREFIX + setId + '_' + SET_STORAGE_VERSION;
-    }
-
-    function isValidQuestion(x) {
-        return (
-            x &&
-            typeof x.q === 'string' &&
-            Array.isArray(x.o) &&
-            x.o.length === 4 &&
-            Number.isInteger(x.a)
-        );
-    }
-
-    function loadSetQuestions(set) {
-        try {
-            const raw = localStorage.getItem(setStorageKey(set.id));
-            if (raw) {
-                const parsed = JSON.parse(raw);
-                if (
-                    Array.isArray(parsed) &&
-                    parsed.length === set.questions.length &&
-                    parsed.every(isValidQuestion)
-                ) {
-                    return parsed;
-                }
-            }
-        } catch {
-            /* fall back to defaults */
-        }
-        return JSON.parse(JSON.stringify(set.questions));
-    }
-
-    function saveSetQuestions(setId, questions) {
-        try {
-            localStorage.setItem(
-                setStorageKey(setId),
-                JSON.stringify(questions)
-            );
-        } catch (e) {
-            alert('No se pudo guardar: ' + e.message);
-        }
-    }
 
     function loadSelection() {
         try {
@@ -103,10 +57,10 @@
         updateThemeButton();
     }
 
-    // Current loaded data per set (kept in sync with localStorage).
+    // Questions per set, read straight from the bundled data.
     const setQuestionsById = {};
     for (const set of SETS) {
-        setQuestionsById[set.id] = loadSetQuestions(set);
+        setQuestionsById[set.id] = set.questions;
     }
 
     // Active quiz bank: array of { q, o, a, setId, localIdx }.
@@ -117,7 +71,6 @@
         pos: 0,
         answers: [],
         mode: 'seq',
-        editing: false,
         view: 'setup', // 'setup' | 'quiz'
         selectedSets: []
     };
@@ -263,7 +216,6 @@
         if (state.mode === 'rand') state.order = shuffle(state.order);
         state.answers = new Array(QUESTIONS.length).fill(null);
         state.pos = 0;
-        state.editing = false;
         state.view = 'quiz';
 
         el.setupArea.hidden = true;
@@ -318,11 +270,6 @@
         el.bar.style.width = ((state.pos + 1) / total) * 100 + '%';
         el.review.disabled = wrong === 0;
 
-        if (state.editing) {
-            renderEditor(qIdx, q, total);
-            return;
-        }
-
         const setLabel = labelForSet(q.setId);
         const optionsHtml = q.o
             .map((text, i) => {
@@ -349,10 +296,7 @@
 
         el.area.innerHTML = `
             <div class="card">
-                <div class="q-head">
-                    <div class="q-num">Pregunta ${state.pos + 1} de ${total}${setLabel ? ` · <span class="set-tag">${esc(setLabel)}</span>` : ''}</div>
-                    <button id="edit-btn" class="edit-btn" title="Editar pregunta">✏️ Editar</button>
-                </div>
+                <div class="q-num">Pregunta ${state.pos + 1} de ${total}${setLabel ? ` · <span class="set-tag">${esc(setLabel)}</span>` : ''}</div>
                 <p class="q-text">${esc(q.q)}</p>
                 <div class="options">${optionsHtml}</div>
                 ${feedback}
@@ -362,11 +306,6 @@
                 </div>
             </div>
         `;
-
-        document.getElementById('edit-btn').addEventListener('click', () => {
-            state.editing = true;
-            render();
-        });
 
         el.area.querySelectorAll('.opt').forEach((btn) => {
             btn.addEventListener('click', () => {
@@ -402,67 +341,6 @@
         return s ? s.name : '';
     }
 
-    function renderEditor(qIdx, q, total) {
-        el.area.innerHTML = `
-            <div class="card">
-                <div class="q-num">Editando pregunta ${state.pos + 1} de ${total}</div>
-                <label class="edit-label">Enunciado</label>
-                <textarea id="edit-q" class="edit-input" rows="3">${esc(q.q)}</textarea>
-                <label class="edit-label">Opciones (marca la correcta)</label>
-                ${q.o
-                    .map(
-                        (text, i) => `
-                    <div class="edit-opt-row">
-                        <input type="radio" name="edit-correct" id="edit-c-${i}" value="${i}" ${i === q.a ? 'checked' : ''}>
-                        <label for="edit-c-${i}" class="letter">${LETTERS[i]}</label>
-                        <textarea class="edit-input edit-opt" data-i="${i}" rows="2">${esc(text)}</textarea>
-                    </div>`
-                    )
-                    .join('')}
-                <div class="nav">
-                    <button id="edit-cancel">Cancelar</button>
-                    <button id="edit-save" class="primary">Guardar</button>
-                </div>
-            </div>
-        `;
-
-        document.getElementById('edit-cancel').addEventListener('click', () => {
-            state.editing = false;
-            render();
-        });
-
-        document.getElementById('edit-save').addEventListener('click', () => {
-            const newQ = document.getElementById('edit-q').value.trim();
-            const newOpts = Array.from(
-                document.querySelectorAll('.edit-opt')
-            ).map((t) => t.value.trim());
-            const checked = document.querySelector(
-                'input[name="edit-correct"]:checked'
-            );
-            const newA = checked ? parseInt(checked.value, 10) : q.a;
-            if (!newQ || newOpts.some((o) => !o)) {
-                alert('El enunciado y las 4 opciones no pueden estar vacíos.');
-                return;
-            }
-            const updated = { q: newQ, o: newOpts, a: newA };
-            // Persist the edit in the owning set.
-            const { setId, localIdx } = QUESTIONS[qIdx];
-            setQuestionsById[setId][localIdx] = updated;
-            saveSetQuestions(setId, setQuestionsById[setId]);
-            // Refresh the active bank entry.
-            QUESTIONS[qIdx] = {
-                q: newQ,
-                o: newOpts.slice(),
-                a: newA,
-                setId,
-                localIdx
-            };
-            state.answers[qIdx] = null;
-            state.editing = false;
-            render();
-        });
-    }
-
     function renderGrid() {
         el.grid.innerHTML = state.order
             .map((qIdx, i) => {
@@ -495,20 +373,6 @@
     }
 
     function resetCurrentQuiz() {
-        // Wipe edits for the selected sets and rebuild from defaults.
-        for (const setId of state.selectedSets) {
-            try {
-                localStorage.removeItem(setStorageKey(setId));
-            } catch {
-                /* ignore */
-            }
-            const set = SETS.find((s) => s.id === setId);
-            if (set) {
-                setQuestionsById[setId] = JSON.parse(
-                    JSON.stringify(set.questions)
-                );
-            }
-        }
         startQuiz(state.selectedSets);
     }
 
@@ -529,7 +393,7 @@
 
     el.restart.addEventListener('click', () => {
         const ok = confirm(
-            '¿Reiniciar el test?\n\nEsto borrará tus respuestas Y restablecerá las preguntas y respuestas al conjunto inicial (se perderán tus ediciones en los conjuntos seleccionados).'
+            '¿Reiniciar el test?\n\nEsto borrará tus respuestas.'
         );
         if (!ok) return;
         resetCurrentQuiz();
