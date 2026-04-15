@@ -1,6 +1,9 @@
 (function () {
     'use strict';
 
+    const I18N = window.I18N;
+    const t = (k, p) => I18N.t(k, p);
+
     const SETS = (window.QUESTION_SETS || []).slice();
     const LETTERS = ['a', 'b', 'c', 'd'];
     const SELECTION_KEY = 'quizzy_selected_sets_v1';
@@ -41,7 +44,7 @@
         if (!btn) return;
         const isDark = currentTheme() === 'dark';
         btn.textContent = isDark ? '☀️' : '🌙';
-        btn.title = isDark ? 'Tema claro' : 'Tema oscuro';
+        btn.title = isDark ? t('theme.light') : t('theme.dark');
         btn.setAttribute('aria-label', btn.title);
     }
 
@@ -57,13 +60,36 @@
         updateThemeButton();
     }
 
+    // ---------- Language switcher ----------
+
+    function renderLangToggle() {
+        const container = document.getElementById('lang-toggle');
+        if (!container) return;
+        const current = I18N.getLang();
+        container.innerHTML = I18N.availableLangs()
+            .map(
+                (l) =>
+                    `<button type="button" class="lang-btn${
+                        l.code === current ? ' active' : ''
+                    }" data-lang="${l.code}" title="${esc(l.label)}" aria-label="${esc(l.label)}">${esc(l.short)}</button>`
+            )
+            .join('');
+        container.querySelectorAll('.lang-btn').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                I18N.setLang(btn.dataset.lang);
+            });
+        });
+    }
+
     // Questions per set, read straight from the bundled data.
     const setQuestionsById = {};
     for (const set of SETS) {
         setQuestionsById[set.id] = set.questions;
     }
 
-    // Active quiz bank: array of { q, o, a, setId, localIdx }.
+    // Active quiz bank: array of raw question objects (with translations
+    // preserved) plus {setId, localIdx}. Localization happens at render time
+    // via I18N.localizedQuestion.
     let QUESTIONS = [];
 
     const state = {
@@ -129,14 +155,12 @@
         el.setupArea.hidden = false;
         el.quizContainer.hidden = true;
         el.stats.hidden = true;
-        el.subtitle.textContent =
-            'Elige los conjuntos de preguntas para empezar';
+        el.subtitle.textContent = t('setup.subtitlePrompt');
 
         if (!SETS.length) {
-            el.setList.innerHTML =
-                '<p class="setup-empty">No se han encontrado conjuntos de preguntas.</p>';
+            el.setList.innerHTML = `<p class="setup-empty">${esc(t('setup.empty'))}</p>`;
             el.startBtn.disabled = true;
-            el.setupTotal.textContent = '0 preguntas seleccionadas';
+            el.setupTotal.textContent = t('setup.zeroSelected');
             return;
         }
 
@@ -147,14 +171,15 @@
         el.setList.innerHTML = SETS.map((s) => {
             const count = setQuestionsById[s.id].length;
             const checked = previous.includes(s.id) ? 'checked' : '';
+            const loc = I18N.localizedSet(s);
             return `
                     <label class="set-item">
                         <input type="checkbox" class="set-check" value="${esc(s.id)}" ${checked}>
                         <div class="set-info">
-                            <div class="set-name">${esc(s.name)}</div>
-                            <div class="set-desc">${esc(s.description || '')}</div>
+                            <div class="set-name">${esc(loc.name)}</div>
+                            <div class="set-desc">${esc(loc.description || '')}</div>
                         </div>
-                        <div class="set-count">${count} pregs.</div>
+                        <div class="set-count">${count} ${esc(t('setup.questionsAbbrev'))}</div>
                     </label>
                 `;
         }).join('');
@@ -180,8 +205,8 @@
         );
         el.setupTotal.textContent =
             total === 0
-                ? 'Selecciona al menos un conjunto'
-                : `${total} preguntas seleccionadas`;
+                ? t('setup.noneSelected')
+                : t('setup.selectedCount', { count: total });
         el.startBtn.disabled = total === 0;
     }
 
@@ -194,10 +219,11 @@
             if (!items) continue;
             for (let i = 0; i < items.length; i++) {
                 const it = items[i];
+                // Preserve translations (and any other fields) alongside the
+                // base q/o/a so they survive through to the render phase.
                 bank.push({
-                    q: it.q,
+                    ...it,
                     o: it.o.slice(),
-                    a: it.a,
                     setId,
                     localIdx: i
                 });
@@ -222,14 +248,20 @@
         el.quizContainer.hidden = false;
         el.stats.hidden = false;
 
+        updateQuizSubtitle();
+        render();
+    }
+
+    function updateQuizSubtitle() {
+        if (state.view !== 'quiz') return;
         const names = state.selectedSets
             .map((id) => SETS.find((s) => s.id === id))
             .filter(Boolean)
-            .map((s) => s.name);
-        el.subtitle.textContent =
-            names.join(' + ') + ' · ' + QUESTIONS.length + ' preguntas';
-
-        render();
+            .map((s) => I18N.localizedSet(s).name);
+        el.subtitle.textContent = t('quiz.subtitle', {
+            names: names.join(' + '),
+            count: QUESTIONS.length
+        });
     }
 
     function render() {
@@ -240,14 +272,14 @@
         if (state.pos < 0 || state.pos >= state.order.length) state.pos = 0;
 
         const qIdx = state.order[state.pos];
-        const q = QUESTIONS[qIdx];
+        const rawQ = QUESTIONS[qIdx];
+        const q = rawQ ? I18N.localizedQuestion(rawQ) : null;
         const total = QUESTIONS.length;
 
         if (el.total) el.total.textContent = total;
 
         if (!q) {
-            el.area.innerHTML =
-                '<div class="card"><p class="q-text">Error al cargar la pregunta. <button id="reset-now">Reiniciar</button></p></div>';
+            el.area.innerHTML = `<div class="card"><p class="q-text">${esc(t('quiz.loadError'))} <button id="reset-now">${esc(t('quiz.resetNow'))}</button></p></div>`;
             const btn = document.getElementById('reset-now');
             if (btn) {
                 btn.addEventListener('click', resetCurrentQuiz);
@@ -270,7 +302,7 @@
         el.bar.style.width = ((state.pos + 1) / total) * 100 + '%';
         el.review.disabled = wrong === 0;
 
-        const setLabel = labelForSet(q.setId);
+        const setLabel = labelForSet(rawQ.setId);
         const optionsHtml = q.o
             .map((text, i) => {
                 let cls = 'opt';
@@ -288,21 +320,26 @@
         let feedback = '';
         if (answered) {
             if (answered.correct) {
-                feedback = '<div class="feedback ok show">✓ Correcto</div>';
+                feedback = `<div class="feedback ok show">${esc(t('quiz.correct'))}</div>`;
             } else {
-                feedback = `<div class="feedback ko show">✗ Incorrecto. Respuesta correcta: <b>${LETTERS[q.a]})</b> ${esc(q.o[q.a])}</div>`;
+                feedback = `<div class="feedback ko show">${esc(t('quiz.wrongPrefix'))} <b>${LETTERS[q.a]})</b> ${esc(q.o[q.a])}</div>`;
             }
         }
 
+        const qNumText = t('quiz.questionNum', {
+            pos: state.pos + 1,
+            total: total
+        });
+
         el.area.innerHTML = `
             <div class="card">
-                <div class="q-num">Pregunta ${state.pos + 1} de ${total}${setLabel ? ` · <span class="set-tag">${esc(setLabel)}</span>` : ''}</div>
+                <div class="q-num">${esc(qNumText)}${setLabel ? ` · <span class="set-tag">${esc(setLabel)}</span>` : ''}</div>
                 <p class="q-text">${esc(q.q)}</p>
                 <div class="options">${optionsHtml}</div>
                 ${feedback}
                 <div class="nav">
-                    <button id="prev" ${state.pos === 0 ? 'disabled' : ''}>← Anterior</button>
-                    <button id="next" class="primary" ${state.pos === total - 1 ? 'disabled' : ''}>Siguiente →</button>
+                    <button id="prev" ${state.pos === 0 ? 'disabled' : ''}>${esc(t('quiz.prev'))}</button>
+                    <button id="next" class="primary" ${state.pos === total - 1 ? 'disabled' : ''}>${esc(t('quiz.next'))}</button>
                 </div>
             </div>
         `;
@@ -338,7 +375,7 @@
     function labelForSet(setId) {
         if (state.selectedSets.length <= 1) return '';
         const s = SETS.find((x) => x.id === setId);
-        return s ? s.name : '';
+        return s ? I18N.localizedSet(s).name : '';
     }
 
     function renderGrid() {
@@ -392,9 +429,7 @@
     });
 
     el.restart.addEventListener('click', () => {
-        const ok = confirm(
-            '¿Reiniciar el test?\n\nEsto borrará tus respuestas.'
-        );
+        const ok = confirm(t('restart.confirm'));
         if (!ok) return;
         resetCurrentQuiz();
     });
@@ -412,7 +447,6 @@
         render();
     });
 
-    updateThemeButton();
     if (el.themeToggle) {
         el.themeToggle.addEventListener('click', () => {
             setTheme(currentTheme() === 'dark' ? 'light' : 'dark', true);
@@ -435,6 +469,27 @@
         if (mq.addEventListener) mq.addEventListener('change', onChange);
         else if (mq.addListener) mq.addListener(onChange);
     }
+
+    // ---------- Language wiring ----------
+
+    // Apply translations to all static markup on initial load.
+    I18N.applyStaticTranslations();
+    renderLangToggle();
+    updateThemeButton();
+
+    // Re-render everything that carries localized text when the user switches
+    // languages mid-session.
+    I18N.onChange(() => {
+        I18N.applyStaticTranslations();
+        renderLangToggle();
+        updateThemeButton();
+        if (state.view === 'setup') {
+            renderSetup();
+        } else {
+            updateQuizSubtitle();
+            render();
+        }
+    });
 
     // Initial render: always show the setup screen (pre-checking last selection).
     state.selectedSets = loadSelection();

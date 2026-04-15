@@ -14,6 +14,7 @@ module.exports = [
                 window: 'readonly',
                 document: 'readonly',
                 localStorage: 'readonly',
+                navigator: 'readonly',
                 alert: 'readonly',
                 confirm: 'readonly'
             }
