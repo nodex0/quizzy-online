@@ -35,8 +35,9 @@ When you submit a comment or flag through the site, we store:
   captured when the form is submitted.
 - The **timestamp** of the submission.
 
-We do not require an account and we do not use third-party analytics or
-advertising cookies.
+We do not require an account and we do not use advertising cookies. See
+the **Analytics** section below for the cookieless traffic measurement
+we run.
 
 ### Why we process this data (lawful basis)
 
@@ -46,6 +47,15 @@ advertising cookies.
 - **IP address + user-agent:** legitimate interest — to detect and mitigate
   spam, abuse and attacks, as is standard for any user-submitted-content
   service.
+
+### Analytics: Cloudflare Web Analytics
+
+We measure aggregate traffic with **Cloudflare Web Analytics**. It is
+**cookieless** and does not fingerprint visitors: it reports counts like
+page views, referrers, countries and device classes, not individual
+users. See Cloudflare's documentation at
+https://www.cloudflare.com/web-analytics/ and their privacy policy at
+https://www.cloudflare.com/privacypolicy/.
 
 ### Anti-spam: Cloudflare Turnstile
 

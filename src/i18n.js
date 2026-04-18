@@ -94,7 +94,10 @@
             'report.turnstileUnavailable':
                 '⚠ Anti-spam no disponible. Contacta al administrador.',
             'report.turnstileError': '⚠ Error Turnstile: {msg}',
-            'report.sendError': 'Error al enviar'
+            'report.sendError': 'Error al enviar',
+            'footer.disclaimer':
+                'Proyecto independiente y gratuito, no afiliado a Osakidetza ni al Gobierno Vasco. Preguntas extraídas del material oficial publicado por Osakidetza.',
+            'footer.contact': 'Contacto y privacidad'
         },
         eu: {
             title: 'OPE Osakidetza',
@@ -171,7 +174,10 @@
             'report.turnstileUnavailable':
                 '⚠ Anti-spam ez dago erabilgarri. Jarri harremanetan administratzailearekin.',
             'report.turnstileError': '⚠ Turnstile errorea: {msg}',
-            'report.sendError': 'Errorea bidaltzean'
+            'report.sendError': 'Errorea bidaltzean',
+            'footer.disclaimer':
+                'Proiektu independentea eta doakoa, ez dago Osakidetzarekin edo Eusko Jaurlaritzarekin lotuta. Galderak Osakidetzak argitaratutako material ofizialetik atera dira.',
+            'footer.contact': 'Harremanetarako eta pribatutasuna'
         }
     };
 

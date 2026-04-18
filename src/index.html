@@ -175,16 +175,46 @@
                     <div class="grid" id="grid"></div>
                 </details>
             </div>
+
+            <footer class="site-footer">
+                <p data-i18n="footer.disclaimer">
+                    Proyecto independiente y gratuito, no afiliado a Osakidetza
+                    ni al Gobierno Vasco. Preguntas extraídas del material
+                    oficial publicado por Osakidetza.
+                </p>
+                <p>
+                    <a
+                        href="mailto:privacy@ope.eus"
+                        data-i18n="footer.contact"
+                        >Contacto y privacidad</a
+                    >
+                </p>
+            </footer>
         </div>
 
         <script>
             // Question reporting. Runs against same-origin Pages Functions
             // under /comments and /admin. Set `turnstileSiteKey` from the
             // Cloudflare Turnstile dashboard; leave empty to keep the feature
-            // inert. See BACKEND.md for setup.
+            // inert. `cfAnalyticsToken` enables Cloudflare Web Analytics
+            // (cookieless). Leave empty to disable the beacon entirely.
+            // See BACKEND.md for setup.
             window.QUIZZY_CONFIG = {
-                turnstileSiteKey: '0x4AAAAAAC-GTfF0O_9lP6_j'
+                turnstileSiteKey: '0x4AAAAAAC-GTfF0O_9lP6_j',
+                cfAnalyticsToken: '024b31ad9c2347b4a815322a278855c5'
             };
+            (function () {
+                var token = window.QUIZZY_CONFIG.cfAnalyticsToken;
+                if (!token) return;
+                var s = document.createElement('script');
+                s.defer = true;
+                s.src = 'https://static.cloudflareinsights.com/beacon.min.js';
+                s.setAttribute(
+                    'data-cf-beacon',
+                    JSON.stringify({ token: token })
+                );
+                document.head.appendChild(s);
+            })();
         </script>
         <script src="./i18n.js"></script>
         <script src="./data/comun.js"></script>
