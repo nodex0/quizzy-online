@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title data-i18n="title">Quizzy Online — OPE Osakidetza</title>
+        <title data-i18n="title">OPE Osakidetza</title>
         <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
         <link rel="shortcut icon" href="./favicon.ico" />
         <link rel="stylesheet" href="./styles.css" />
@@ -29,8 +29,15 @@
     <body>
         <div class="wrap">
             <header>
-                <div>
-                    <h1 data-i18n="header.title">Quizzy — OPE Osakidetza</h1>
+                <button
+                    type="button"
+                    id="header-home"
+                    class="header-home"
+                    data-i18n-attr="aria-label:header.home,title:header.home"
+                    aria-label="Volver al inicio"
+                    title="Volver al inicio"
+                >
+                    <h1 data-i18n="header.title">OPE Osakidetza</h1>
                     <p
                         class="subtitle"
                         id="subtitle"
@@ -38,7 +45,7 @@
                     >
                         Test de práctica
                     </p>
-                </div>
+                </button>
                 <div class="stats" id="stats" hidden>
                     <div class="stat">
                         <span data-i18n="stats.question">Pregunta</span
@@ -156,10 +163,10 @@
         </div>
 
         <script>
-            // Community comments & flagging. Runs against same-origin Pages
-            // Functions under /comments and /admin. Set `turnstileSiteKey`
-            // from the Cloudflare Turnstile dashboard; leave empty to keep
-            // the feature inert. See BACKEND.md for setup.
+            // Question reporting. Runs against same-origin Pages Functions
+            // under /comments and /admin. Set `turnstileSiteKey` from the
+            // Cloudflare Turnstile dashboard; leave empty to keep the feature
+            // inert. See BACKEND.md for setup.
             window.QUIZZY_CONFIG = {
                 turnstileSiteKey: '0x4AAAAAAC-GTfF0O_9lP6_j'
             };
@@ -169,7 +176,7 @@
         <script src="./data/celador.js"></script>
         <script src="./data/auxiliar_admin.js"></script>
         <script src="./data/operario_servicios.js"></script>
-        <script src="./comments.js"></script>
+        <script src="./report.js"></script>
         <script src="./app.js"></script>
     </body>
 </html>

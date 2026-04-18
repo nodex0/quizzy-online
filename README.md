@@ -171,7 +171,7 @@ src/                   # static site — deployed to Pages as-is
 ├── styles.css
 ├── app.js             # quiz logic (set selection + quiz)
 ├── i18n.js            # translations table + runtime localization
-├── comments.js        # comments & flagging client (no-op until configured)
+├── report.js          # question-report client (no-op until configured)
 ├── _headers           # Cloudflare Pages security headers
 ├── data/
 │   ├── comun.js           # parte común — 300 preguntas (Temario Común)

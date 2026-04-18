@@ -237,7 +237,8 @@
         restart: document.getElementById('restart'),
         review: document.getElementById('review'),
         themeToggle: document.getElementById('theme-toggle'),
-        resumeBanner: document.getElementById('resume-banner')
+        resumeBanner: document.getElementById('resume-banner'),
+        headerHome: document.getElementById('header-home')
     };
 
     function shuffle(arr) {
@@ -541,14 +542,14 @@
                     <button id="prev" ${state.pos === 0 ? 'disabled' : ''}>${esc(t('quiz.prev'))}</button>
                     <button id="next" class="primary" ${state.pos === total - 1 ? 'disabled' : ''}>${esc(t('quiz.next'))}</button>
                 </div>
-                <div id="comments-host" class="comments-host"></div>
+                <div id="report-host" class="report-host"></div>
             </div>
         `;
 
-        if (window.QuizzyComments && window.QuizzyComments.enabled()) {
-            const host = document.getElementById('comments-host');
+        if (window.QuizzyReport && window.QuizzyReport.enabled()) {
+            const host = document.getElementById('report-host');
             if (host) {
-                window.QuizzyComments.mount(host, {
+                window.QuizzyReport.mount(host, {
                     setId: rawQ.setId,
                     questionIdx: rawQ.localIdx,
                     questionText: q.q,
@@ -647,6 +648,12 @@
     el.changeSets.addEventListener('click', () => {
         renderSetup();
     });
+
+    if (el.headerHome) {
+        el.headerHome.addEventListener('click', () => {
+            if (state.view !== 'setup') renderSetup();
+        });
+    }
 
     el.restart.addEventListener('click', () => {
         const ok = confirm(t('restart.confirm'));
