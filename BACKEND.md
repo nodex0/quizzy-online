@@ -94,12 +94,26 @@ secret) into `QUIZZY_CONFIG`:
 ```html
 <script>
     window.QUIZZY_CONFIG = {
-        turnstileSiteKey: '0x4AAAAAAA…'
+        turnstileSiteKey: '0x4AAAAAAA…',
+        cfAnalyticsToken: ''
     };
 </script>
 ```
 
 Commit and push. Cloudflare Pages redeploys automatically.
+
+### 6. (Optional) Enable Cloudflare Web Analytics
+
+Cloudflare dashboard → **Analytics & Logs → Web Analytics** → **Add a
+site**. Enter your Pages hostname. Cloudflare gives you a JS snippet
+containing a `token` value — paste that token into
+`QUIZZY_CONFIG.cfAnalyticsToken`. The site auto-injects the beacon
+only when the token is non-empty.
+
+The beacon is cookieless and reports aggregate traffic (views, referrers,
+countries, device class). It does not distinguish AI crawlers from other
+bots — if you need that level of detail, a custom Pages Function
+middleware logging to D1 is the alternative.
 
 ## Using the admin panel
 
