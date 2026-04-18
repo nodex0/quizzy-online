@@ -6,11 +6,121 @@
 
     const SETS = (window.QUESTION_SETS || []).slice();
     const LETTERS = ['a', 'b', 'c', 'd'];
+    const ROLE_KEY = 'quizzy_selected_role_v1';
     const SELECTION_KEY = 'quizzy_selected_sets_v1';
+    const SETUP_MODE_KEY = 'quizzy_setup_mode_v1';
     const THEME_KEY = 'celador_theme';
     const PROGRESS_KEY = 'quizzy_progress_v1';
 
-    function loadSelection() {
+    // Role catalogue. Each role pairs a common questionnaire with a
+    // role-specific one. Only roles whose both sets are bundled will be
+    // shown in the picker.
+    const ROLE_CATALOGUE = [
+        {
+            id: 'celador',
+            commonSetId: 'comun',
+            specificSetId: 'celador',
+            names: { es: 'Celador/a', eu: 'Zeladorea' },
+            icon:
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+                'stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" ' +
+                'aria-hidden="true">' +
+                '<circle cx="12" cy="4.5" r="1.8"/>' +
+                '<path d="M10.5 7.5v5h4l1.5 3"/>' +
+                '<circle cx="10" cy="17" r="4.5"/>' +
+                '<path d="M14.5 17h3"/>' +
+                '</svg>'
+        },
+        {
+            id: 'auxiliar_admin',
+            commonSetId: 'comun',
+            specificSetId: 'auxiliar_admin',
+            names: {
+                es: 'Auxiliar Administrativo/a',
+                eu: 'Administrari laguntzailea'
+            },
+            icon:
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+                'stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" ' +
+                'aria-hidden="true">' +
+                '<rect x="5" y="4" width="14" height="18" rx="2"/>' +
+                '<rect x="8" y="2" width="8" height="4" rx="1"/>' +
+                '<path d="M8 11h8"/>' +
+                '<path d="M8 15h8"/>' +
+                '<path d="M8 19h5"/>' +
+                '</svg>'
+        },
+        {
+            id: 'operario_servicios',
+            commonSetId: 'comun',
+            specificSetId: 'operario_servicios',
+            names: {
+                es: 'Operario/a de Servicios',
+                eu: 'Zerbitzuetako langilea'
+            },
+            icon:
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+                'stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" ' +
+                'aria-hidden="true">' +
+                '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4l-6.6 6.6a1.5 1.5 0 0 0 2.1 2.1l6.6-6.6a4 4 0 0 0 5.4-5.4l-2.4 2.4-2.1-2.1z"/>' +
+                '</svg>'
+        }
+    ];
+
+    // Only surface roles whose required sets are actually bundled.
+    const ROLES = ROLE_CATALOGUE.filter(
+        (r) =>
+            SETS.some((s) => s.id === r.commonSetId) &&
+            SETS.some((s) => s.id === r.specificSetId)
+    );
+
+    function roleById(id) {
+        return ROLES.find((r) => r.id === id) || null;
+    }
+
+    function roleSets(role) {
+        return [role.commonSetId, role.specificSetId];
+    }
+
+    function roleName(role) {
+        if (!role) return '';
+        const lang = I18N.getLang();
+        return role.names[lang] || role.names.es || role.id;
+    }
+
+    // Try to infer which role a saved selectedSets array belongs to.
+    function roleForSets(ids) {
+        if (!Array.isArray(ids) || !ids.length) return null;
+        return (
+            ROLES.find(
+                (r) =>
+                    ids.length === 2 &&
+                    ids.includes(r.commonSetId) &&
+                    ids.includes(r.specificSetId)
+            ) || null
+        );
+    }
+
+    function loadSelectedRoleId() {
+        try {
+            const raw = localStorage.getItem(ROLE_KEY);
+            if (!raw) return null;
+            return roleById(raw) ? raw : null;
+        } catch {
+            return null;
+        }
+    }
+
+    function saveSelectedRoleId(id) {
+        try {
+            if (id) localStorage.setItem(ROLE_KEY, id);
+            else localStorage.removeItem(ROLE_KEY);
+        } catch {
+            /* ignore */
+        }
+    }
+
+    function loadCustomSelection() {
         try {
             const raw = localStorage.getItem(SELECTION_KEY);
             if (!raw) return [];
@@ -24,9 +134,27 @@
         return [];
     }
 
-    function saveSelection(ids) {
+    function saveCustomSelection(ids) {
         try {
             localStorage.setItem(SELECTION_KEY, JSON.stringify(ids));
+        } catch {
+            /* ignore */
+        }
+    }
+
+    function loadSetupMode() {
+        try {
+            const m = localStorage.getItem(SETUP_MODE_KEY);
+            if (m === 'roles' || m === 'custom') return m;
+        } catch {
+            /* ignore */
+        }
+        return 'roles';
+    }
+
+    function saveSetupMode(mode) {
+        try {
+            localStorage.setItem(SETUP_MODE_KEY, mode);
         } catch {
             /* ignore */
         }
@@ -212,7 +340,11 @@
         answers: [],
         mode: 'seq',
         view: 'setup', // 'setup' | 'quiz'
-        selectedSets: []
+        selectedSets: [],
+        selectedRoleId: null,
+        pendingRoleId: null, // role highlighted in the setup picker
+        setupMode: 'roles', // 'roles' | 'custom'
+        pendingCustom: [] // set IDs ticked in the custom picker
     };
 
     const el = {
@@ -220,7 +352,11 @@
         stats: document.getElementById('stats'),
         setupArea: document.getElementById('setup-area'),
         quizContainer: document.getElementById('quiz-container'),
+        setupTitle: document.getElementById('setup-title'),
+        setupHelp: document.getElementById('setup-help'),
+        roleList: document.getElementById('role-list'),
         setList: document.getElementById('set-list'),
+        setupModeToggle: document.getElementById('setup-mode-toggle'),
         setupTotal: document.getElementById('setup-total'),
         startBtn: document.getElementById('start-btn'),
         changeSets: document.getElementById('change-sets'),
@@ -271,64 +407,153 @@
         el.setupArea.hidden = false;
         el.quizContainer.hidden = true;
         el.stats.hidden = true;
-        el.subtitle.textContent = t('setup.subtitlePrompt');
 
         renderResumeBanner();
 
-        if (!SETS.length) {
-            el.setList.innerHTML = `<p class="setup-empty">${esc(t('setup.empty'))}</p>`;
-            el.startBtn.disabled = true;
-            el.setupTotal.textContent = t('setup.zeroSelected');
-            return;
-        }
+        // Fall back to custom mode when no roles are available but sets are.
+        if (!ROLES.length && SETS.length) state.setupMode = 'custom';
 
-        const previous = state.selectedSets.length
-            ? state.selectedSets
-            : loadSelection();
+        const customMode = state.setupMode === 'custom';
+        el.subtitle.textContent = customMode
+            ? t('setup.subtitlePromptCustom')
+            : t('setup.subtitlePrompt');
+        el.setupTitle.textContent = customMode
+            ? t('setup.customTitle')
+            : t('setup.title');
+        el.setupHelp.textContent = customMode
+            ? t('setup.customHelp')
+            : t('setup.help');
+        el.setupModeToggle.textContent = customMode
+            ? t('setup.rolesToggle')
+            : t('setup.customToggle');
+        el.setupModeToggle.hidden = !ROLES.length;
+        el.roleList.hidden = customMode;
+        el.setList.hidden = !customMode;
 
-        el.setList.innerHTML = SETS.map((s) => {
-            const count = setQuestionsById[s.id].length;
-            const checked = previous.includes(s.id) ? 'checked' : '';
-            const loc = I18N.localizedSet(s);
-            return `
-                    <label class="set-item">
-                        <input type="checkbox" class="set-check" value="${esc(s.id)}" ${checked}>
-                        <div class="set-info">
-                            <div class="set-name">${esc(loc.name)}</div>
-                            <div class="set-desc">${esc(loc.description || '')}</div>
-                        </div>
-                        <div class="set-count">${count} ${esc(t('setup.questionsAbbrev'))}</div>
-                    </label>
-                `;
-        }).join('');
-
-        el.setList.querySelectorAll('.set-check').forEach((input) => {
-            input.addEventListener('change', updateSetupSummary);
-        });
+        if (customMode) renderCustomList();
+        else renderRoleList();
 
         updateSetupSummary();
     }
 
-    function getCheckedSetIds() {
-        return Array.from(
-            el.setList.querySelectorAll('.set-check:checked')
-        ).map((i) => i.value);
+    function renderRoleList() {
+        if (!ROLES.length) {
+            el.roleList.innerHTML = `<p class="setup-empty">${esc(t('setup.empty'))}</p>`;
+            return;
+        }
+
+        // Preselect: in-flight state > persisted role > none.
+        if (!state.pendingRoleId) {
+            const fromState =
+                state.selectedRoleId || roleForSets(state.selectedSets)?.id;
+            state.pendingRoleId = fromState || loadSelectedRoleId();
+            if (!roleById(state.pendingRoleId)) state.pendingRoleId = null;
+        }
+
+        el.roleList.innerHTML = ROLES.map((r) => {
+            const total =
+                (setQuestionsById[r.commonSetId]?.length || 0) +
+                (setQuestionsById[r.specificSetId]?.length || 0);
+            const selected = r.id === state.pendingRoleId ? ' selected' : '';
+            return `
+                <button type="button" class="role-item${selected}" data-role="${esc(r.id)}" aria-pressed="${selected ? 'true' : 'false'}">
+                    <span class="role-icon" aria-hidden="true">${r.icon}</span>
+                    <span class="role-name">${esc(roleName(r))}</span>
+                    <span class="role-desc">${esc(t('setup.roleSummary'))}</span>
+                    <span class="role-count">${total} ${esc(t('setup.questionsAbbrev'))}</span>
+                </button>
+            `;
+        }).join('');
+
+        el.roleList.querySelectorAll('.role-item').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                state.pendingRoleId = btn.dataset.role;
+                el.roleList.querySelectorAll('.role-item').forEach((b) => {
+                    const active = b.dataset.role === state.pendingRoleId;
+                    b.classList.toggle('selected', active);
+                    b.setAttribute('aria-pressed', active ? 'true' : 'false');
+                });
+                updateSetupSummary();
+            });
+        });
+    }
+
+    function renderCustomList() {
+        if (!SETS.length) {
+            el.setList.innerHTML = `<p class="setup-empty">${esc(t('setup.empty'))}</p>`;
+            return;
+        }
+
+        // Seed the custom selection from state > persisted > resolved from the
+        // active role so that flipping modes feels continuous.
+        if (!state.pendingCustom.length) {
+            const seed = loadCustomSelection();
+            if (seed.length) {
+                state.pendingCustom = seed;
+            } else {
+                const role =
+                    roleById(state.pendingRoleId) ||
+                    roleById(state.selectedRoleId);
+                if (role) state.pendingCustom = roleSets(role);
+            }
+        }
+
+        el.setList.innerHTML = SETS.map((s) => {
+            const count = setQuestionsById[s.id].length;
+            const checked = state.pendingCustom.includes(s.id) ? 'checked' : '';
+            const loc = I18N.localizedSet(s);
+            return `
+                <label class="set-item">
+                    <input type="checkbox" class="set-check" value="${esc(s.id)}" ${checked}>
+                    <div class="set-info">
+                        <div class="set-name">${esc(loc.name)}</div>
+                        <div class="set-desc">${esc(loc.description || '')}</div>
+                    </div>
+                    <div class="set-count">${count} ${esc(t('setup.questionsAbbrev'))}</div>
+                </label>
+            `;
+        }).join('');
+
+        el.setList.querySelectorAll('.set-check').forEach((input) => {
+            input.addEventListener('change', () => {
+                state.pendingCustom = Array.from(
+                    el.setList.querySelectorAll('.set-check:checked')
+                ).map((i) => i.value);
+                updateSetupSummary();
+            });
+        });
     }
 
     function updateSetupSummary() {
-        const ids = getCheckedSetIds();
-        const total = ids.reduce(
-            (acc, id) => acc + (setQuestionsById[id]?.length || 0),
-            0
-        );
-        el.setupTotal.textContent =
-            total === 0
-                ? t('setup.noneSelected')
-                : t('setup.selectedCount', { count: total });
-        el.startBtn.disabled = total === 0;
+        if (state.setupMode === 'custom') {
+            const ids = state.pendingCustom;
+            const total = ids.reduce(
+                (acc, id) => acc + (setQuestionsById[id]?.length || 0),
+                0
+            );
+            el.setupTotal.textContent =
+                total === 0
+                    ? t('setup.noneSelectedCustom')
+                    : t('setup.selectedCount', { count: total });
+            el.startBtn.disabled = total === 0;
+            return;
+        }
+        const role = roleById(state.pendingRoleId);
+        if (!role) {
+            el.setupTotal.textContent = t('setup.noneSelected');
+            el.startBtn.disabled = true;
+            return;
+        }
+        const total =
+            (setQuestionsById[role.commonSetId]?.length || 0) +
+            (setQuestionsById[role.specificSetId]?.length || 0);
+        el.setupTotal.textContent = t('setup.selectedCount', { count: total });
+        el.startBtn.disabled = false;
     }
 
     function setNamesLabel(ids) {
+        const role = roleForSets(ids);
+        if (role) return roleName(role);
         return ids
             .map((id) => SETS.find((s) => s.id === id))
             .filter(Boolean)
@@ -407,7 +632,9 @@
     function startQuiz(selectedIds) {
         if (!selectedIds.length) return;
         state.selectedSets = selectedIds.slice();
-        saveSelection(state.selectedSets);
+        const inferred = roleForSets(state.selectedSets);
+        state.selectedRoleId = inferred ? inferred.id : null;
+        saveSelectedRoleId(state.selectedRoleId);
 
         QUESTIONS = buildBank(state.selectedSets);
         state.order = QUESTIONS.map((_, i) => i);
@@ -432,7 +659,9 @@
         if (!snap) return false;
 
         state.selectedSets = snap.selectedSets.slice();
-        saveSelection(state.selectedSets);
+        const inferred = roleForSets(state.selectedSets);
+        state.selectedRoleId = inferred ? inferred.id : null;
+        saveSelectedRoleId(state.selectedRoleId);
         state.mode = snap.mode;
         QUESTIONS = buildBank(state.selectedSets);
         state.order = snap.order.slice();
@@ -455,14 +684,21 @@
 
     function updateQuizSubtitle() {
         if (state.view !== 'quiz') return;
-        const names = state.selectedSets
-            .map((id) => SETS.find((s) => s.id === id))
-            .filter(Boolean)
-            .map((s) => I18N.localizedSet(s).name);
+        const role = roleById(state.selectedRoleId);
+        const label = role
+            ? roleName(role)
+            : state.selectedSets
+                  .map((id) => SETS.find((s) => s.id === id))
+                  .filter(Boolean)
+                  .map((s) => I18N.localizedSet(s).name)
+                  .join(' + ');
         el.subtitle.textContent = t('quiz.subtitle', {
-            names: names.join(' + '),
+            names: label,
             count: QUESTIONS.length
         });
+        el.changeSets.textContent = role
+            ? t('quiz.changeRole')
+            : t('quiz.changeSets');
     }
 
     function render() {
@@ -640,12 +876,32 @@
     el.modeRand.addEventListener('click', () => setMode('rand'));
 
     el.startBtn.addEventListener('click', () => {
-        const ids = getCheckedSetIds();
-        if (!ids.length) return;
-        startQuiz(ids);
+        if (state.setupMode === 'custom') {
+            if (!state.pendingCustom.length) return;
+            saveCustomSelection(state.pendingCustom);
+            saveSetupMode('custom');
+            startQuiz(state.pendingCustom);
+            return;
+        }
+        const role = roleById(state.pendingRoleId);
+        if (!role) return;
+        saveSetupMode('roles');
+        startQuiz(roleSets(role));
     });
 
+    if (el.setupModeToggle) {
+        el.setupModeToggle.addEventListener('click', () => {
+            state.setupMode =
+                state.setupMode === 'custom' ? 'roles' : 'custom';
+            renderSetup();
+        });
+    }
+
     el.changeSets.addEventListener('click', () => {
+        state.pendingRoleId = state.selectedRoleId;
+        state.pendingCustom = state.selectedSets.slice();
+        // Return to whichever picker started the current quiz.
+        state.setupMode = state.selectedRoleId ? 'roles' : 'custom';
         renderSetup();
     });
 
@@ -722,7 +978,9 @@
     // Initial render: if there's a valid in-progress quiz in localStorage,
     // resume it straight away. Otherwise show the setup screen.
     if (!resumeFromSavedProgress()) {
-        state.selectedSets = loadSelection();
+        state.pendingRoleId = loadSelectedRoleId();
+        state.pendingCustom = loadCustomSelection();
+        state.setupMode = loadSetupMode();
         renderSetup();
     }
 })();

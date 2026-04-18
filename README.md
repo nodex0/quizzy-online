@@ -87,7 +87,7 @@ shared across languages because the correct answer never changes.
   name: 'Celador/a — Parte específica',
   description: 'OPE Osakidetza · 200 preguntas',
   translations: {
-    eu: { name: 'Zeladorea — Berariazko zatia',
+    eu: { name: 'Zeladorea — Zati espezifikoa',
           description: 'OPE Osakidetza · 200 galdera' }
   },
   questions: [ /* ... */ ]

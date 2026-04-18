@@ -6,11 +6,11 @@
 (window.QUESTION_SETS = window.QUESTION_SETS || []).push({
   id: "operario_servicios",
   name: "Operario/a de Servicios",
-  description: "OPE Osakidetza · 200 preguntas",
+  description: "OPE Osakidetza · Temario Específico · 200 preguntas",
   translations: {
     eu: {
       name: "Zerbitzuetako langilea",
-      description: "OPE Osakidetza · 200 galdera"
+      description: "OPE Osakidetza · Gai espezifikoa · 200 galdera"
     }
   },
   questions: [

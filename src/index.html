@@ -93,20 +93,35 @@
             <div id="setup-area">
                 <div id="resume-banner" class="card resume-banner" hidden></div>
                 <div class="card">
-                    <h2 class="setup-title" data-i18n="setup.title">
-                        Elige los conjuntos de preguntas
+                    <h2
+                        class="setup-title"
+                        id="setup-title"
+                        data-i18n="setup.title"
+                    >
+                        Elige tu puesto
                     </h2>
-                    <p class="setup-help" data-i18n="setup.help">
-                        Puedes seleccionar uno o varios. Al marcar varios, las
-                        preguntas se combinan en un solo test.
+                    <p class="setup-help" id="setup-help" data-i18n="setup.help">
+                        Selecciona el puesto al que te presentas. El test
+                        combinará el temario común con la parte específica.
                     </p>
-                    <div id="set-list" class="set-list"></div>
+                    <div id="role-list" class="role-list"></div>
+                    <div id="set-list" class="set-list" hidden></div>
+                    <div class="setup-toggle-wrap">
+                        <button
+                            type="button"
+                            id="setup-mode-toggle"
+                            class="link-btn"
+                            data-i18n="setup.customToggle"
+                        >
+                            Elegir conjuntos manualmente →
+                        </button>
+                    </div>
                     <div class="nav">
                         <span
                             id="setup-total"
                             class="setup-total"
-                            data-i18n="setup.zeroSelected"
-                            >0 preguntas seleccionadas</span
+                            data-i18n="setup.noneSelected"
+                            >Selecciona un puesto</span
                         >
                         <button
                             id="start-btn"
