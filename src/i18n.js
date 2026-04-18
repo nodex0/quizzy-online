@@ -41,41 +41,49 @@
             'setup.selectedCount': '{count} preguntas seleccionadas',
             'setup.zeroSelected': 'Selecciona un puesto',
             'setup.questionsAbbrev': 'pregs.',
-            'setup.start': 'Empezar →',
+            'setup.start': 'Empezar',
             'setup.subtitlePrompt': 'Elige tu puesto para empezar',
             'setup.subtitlePromptCustom':
                 'Elige los conjuntos de preguntas para empezar',
             'setup.roleSummary': 'Común + específico',
-            'setup.customToggle': 'Elegir conjuntos manualmente →',
-            'setup.rolesToggle': '← Volver a elegir puesto',
+            'setup.customToggle': 'Elegir conjuntos manualmente',
+            'setup.rolesToggle': 'Volver a elegir puesto',
             'setup.customTitle': 'Elige los conjuntos de preguntas',
             'setup.customHelp':
                 'Selecciona uno o varios conjuntos. Al marcar varios, las preguntas se combinan en un solo test.',
             'setup.noneSelectedCustom': 'Selecciona al menos un conjunto',
             'quiz.modeSeq': 'Orden',
+            'quiz.seqTooltip':
+                'Preguntas y respuestas en su orden original, mostrando el conjunto de cada pregunta.',
             'quiz.modeRand': 'Aleatorio',
-            'quiz.changeSets': '← Cambiar conjuntos',
-            'quiz.changeRole': '← Cambiar puesto',
-            'quiz.restart': '↻ Reiniciar',
+            'quiz.randTooltip':
+                'Preguntas y respuestas al azar, sin mostrar el conjunto de origen.',
+            'quiz.changeSets': 'Cambiar conjuntos',
+            'quiz.changeRole': 'Cambiar puesto',
+            'quiz.restart': 'Reiniciar',
             'quiz.review': 'Ver fallos',
             'quiz.jumpTo': 'Ir a pregunta…',
             'quiz.loadError': 'Error al cargar la pregunta.',
             'quiz.resetNow': 'Reiniciar',
-            'quiz.correct': '✓ Correcto',
-            'quiz.wrongPrefix': '✗ Incorrecto. Respuesta correcta:',
+            'quiz.correct': 'Correcto',
+            'quiz.wrongPrefix': 'Incorrecto. Respuesta correcta:',
             'quiz.questionNum': 'Pregunta {pos} de {total}',
-            'quiz.prev': '← Anterior',
-            'quiz.next': 'Siguiente →',
+            'quiz.prev': 'Anterior',
+            'quiz.next': 'Siguiente',
             'quiz.subtitle': '{names} · {count} preguntas',
+            'modal.cancel': 'Cancelar',
             'restart.confirm':
                 '¿Reiniciar el test?\n\nEsto borrará tus respuestas.',
+            'mode.changeConfirm':
+                '¿Cambiar el orden?\n\nEsto reiniciará el progreso actual.',
+            'mode.changeBtn': 'Cambiar',
             'setup.resumeTitle': 'Test en curso',
             'setup.resumeMeta': '{names} · {answered} de {total} contestadas',
-            'setup.resumeBtn': 'Continuar →',
+            'setup.resumeBtn': 'Continuar',
             'setup.discardBtn': 'Descartar',
             'setup.discardConfirm':
                 '¿Descartar el test en curso?\n\nPerderás las respuestas guardadas.',
-            'report.button': '🚩 Reportar pregunta',
+            'report.button': 'Reportar pregunta',
             'report.title': 'Reportar un error en esta pregunta',
             'report.reason': 'Motivo',
             'report.reasonWrong': 'Respuesta incorrecta',
@@ -90,10 +98,10 @@
             'report.cancel': 'Cancelar',
             'report.submit': 'Enviar',
             'report.sending': 'Enviando…',
-            'report.sent': '✓ Reporte enviado. Gracias.',
+            'report.sent': 'Reporte enviado. Gracias.',
             'report.turnstileUnavailable':
-                '⚠ Anti-spam no disponible. Contacta al administrador.',
-            'report.turnstileError': '⚠ Error Turnstile: {msg}',
+                'Anti-spam no disponible. Contacta al administrador.',
+            'report.turnstileError': 'Error Turnstile: {msg}',
             'report.sendError': 'Error al enviar',
             'footer.disclaimer':
                 'Proyecto independiente y gratuito, no afiliado a Osakidetza ni al Gobierno Vasco. Preguntas extraídas del material oficial publicado por Osakidetza.',
@@ -120,42 +128,50 @@
             'setup.selectedCount': '{count} galdera aukeratuta',
             'setup.zeroSelected': 'Aukeratu lanpostu bat',
             'setup.questionsAbbrev': 'gald.',
-            'setup.start': 'Hasi →',
+            'setup.start': 'Hasi',
             'setup.subtitlePrompt': 'Aukeratu zure lanpostua hasteko',
             'setup.subtitlePromptCustom':
                 'Aukeratu galdera multzoak hasteko',
             'setup.roleSummary': 'Komuna + espezifikoa',
-            'setup.customToggle': 'Eskuz aukeratu multzoak →',
-            'setup.rolesToggle': '← Lanpostua aukeratzera itzuli',
+            'setup.customToggle': 'Eskuz aukeratu multzoak',
+            'setup.rolesToggle': 'Lanpostua aukeratzera itzuli',
             'setup.customTitle': 'Aukeratu galdera multzoak',
             'setup.customHelp':
                 'Aukeratu multzo bat edo gehiago. Hainbat markatzean, galderak test bakarrean bateratzen dira.',
             'setup.noneSelectedCustom': 'Aukeratu gutxienez multzo bat',
             'quiz.modeSeq': 'Ordena',
+            'quiz.seqTooltip':
+                'Galderak eta erantzunak jatorrizko ordenan, galdera bakoitzaren multzoa erakutsiz.',
             'quiz.modeRand': 'Ausazkoa',
-            'quiz.changeSets': '← Multzoak aldatu',
-            'quiz.changeRole': '← Lanpostua aldatu',
-            'quiz.restart': '↻ Berrabiarazi',
+            'quiz.randTooltip':
+                'Galderak eta erantzunak ausaz, jatorrizko multzoa ezkutuan.',
+            'quiz.changeSets': 'Multzoak aldatu',
+            'quiz.changeRole': 'Lanpostua aldatu',
+            'quiz.restart': 'Berrabiarazi',
             'quiz.review': 'Akatsak ikusi',
             'quiz.jumpTo': 'Galderara joan…',
             'quiz.loadError': 'Errorea galdera kargatzean.',
             'quiz.resetNow': 'Berrabiarazi',
-            'quiz.correct': '✓ Zuzena',
-            'quiz.wrongPrefix': '✗ Okerra. Erantzun zuzena:',
+            'quiz.correct': 'Zuzena',
+            'quiz.wrongPrefix': 'Okerra. Erantzun zuzena:',
             'quiz.questionNum': '{total}-(e)tik {pos}. galdera',
-            'quiz.prev': '← Aurrekoa',
-            'quiz.next': 'Hurrengoa →',
+            'quiz.prev': 'Aurrekoa',
+            'quiz.next': 'Hurrengoa',
             'quiz.subtitle': '{names} · {count} galdera',
+            'modal.cancel': 'Utzi',
             'restart.confirm':
                 'Testa berrabiarazi?\n\nHonek zure erantzunak ezabatuko ditu.',
+            'mode.changeConfirm':
+                'Ordena aldatu?\n\nHonek uneko aurrerapena berrabiaraziko du.',
+            'mode.changeBtn': 'Aldatu',
             'setup.resumeTitle': 'Testa martxan',
             'setup.resumeMeta':
                 '{names} · {total}-(e)tik {answered} erantzunda',
-            'setup.resumeBtn': 'Jarraitu →',
+            'setup.resumeBtn': 'Jarraitu',
             'setup.discardBtn': 'Baztertu',
             'setup.discardConfirm':
                 'Martxan dagoen testa baztertu?\n\nGordetako erantzunak galduko dituzu.',
-            'report.button': '🚩 Galdera salatu',
+            'report.button': 'Galdera salatu',
             'report.title': 'Galdera honetako akatsa salatu',
             'report.reason': 'Arrazoia',
             'report.reasonWrong': 'Erantzun okerra',
@@ -170,10 +186,10 @@
             'report.cancel': 'Utzi',
             'report.submit': 'Bidali',
             'report.sending': 'Bidaltzen…',
-            'report.sent': '✓ Txostena bidalita. Eskerrik asko.',
+            'report.sent': 'Txostena bidalita. Eskerrik asko.',
             'report.turnstileUnavailable':
-                '⚠ Anti-spam ez dago erabilgarri. Jarri harremanetan administratzailearekin.',
-            'report.turnstileError': '⚠ Turnstile errorea: {msg}',
+                'Anti-spam ez dago erabilgarri. Jarri harremanetan administratzailearekin.',
+            'report.turnstileError': 'Turnstile errorea: {msg}',
             'report.sendError': 'Errorea bidaltzean',
             'footer.disclaimer':
                 'Proiektu independentea eta doakoa, ez dago Osakidetzarekin edo Eusko Jaurlaritzarekin lotuta. Galderak Osakidetzak argitaratutako material ofizialetik atera dira.',
@@ -188,13 +204,18 @@
         } catch {
             /* ignore */
         }
-        const nav = (
-            navigator.language ||
-            navigator.userLanguage ||
-            ''
-        ).toLowerCase();
-        if (nav.startsWith('eu')) return 'eu';
-        if (nav.startsWith('es')) return 'es';
+        // Inspect navigator.languages in priority order; the browser's
+        // preferred language wins over secondary entries.
+        const candidates = Array.isArray(navigator.languages)
+            ? navigator.languages.slice()
+            : [];
+        if (navigator.language) candidates.push(navigator.language);
+        if (navigator.userLanguage) candidates.push(navigator.userLanguage);
+        for (const raw of candidates) {
+            const tag = String(raw || '').toLowerCase();
+            if (tag.startsWith('eu')) return 'eu';
+            if (tag.startsWith('es')) return 'es';
+        }
         return DEFAULT_LANG;
     }
 
@@ -297,8 +318,19 @@
         scope.querySelectorAll('[data-i18n]').forEach((el) => {
             const key = el.getAttribute('data-i18n');
             if (!key) return;
+            const leading = el.getAttribute('data-i18n-icon');
+            const trailing = el.getAttribute('data-i18n-icon-trailing');
             const html = el.getAttribute('data-i18n-html') !== null;
-            if (html) el.innerHTML = t(key);
+            if ((leading || trailing) && window.ICONS) {
+                const leadHtml = leading ? window.ICONS.get(leading) : '';
+                const tailHtml = trailing ? window.ICONS.get(trailing) : '';
+                el.innerHTML =
+                    leadHtml +
+                    '<span class="btn-label">' +
+                    t(key) +
+                    '</span>' +
+                    tailHtml;
+            } else if (html) el.innerHTML = t(key);
             else el.textContent = t(key);
         });
         scope.querySelectorAll('[data-i18n-attr]').forEach((el) => {

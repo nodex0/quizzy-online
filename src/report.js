@@ -29,6 +29,16 @@
         return Boolean(SITE_KEY);
     }
 
+    function icon(name) {
+        return (window.ICONS && window.ICONS.get(name)) || '';
+    }
+
+    function setStatus(el, iconName, text) {
+        if (!el) return;
+        el.innerHTML =
+            (iconName ? icon(iconName) : '') + '<span>' + esc(text) + '</span>';
+    }
+
     function esc(s) {
         return String(s == null ? '' : s).replace(
             /[&<>"']/g,
@@ -104,10 +114,14 @@
                 esc(t(r.labelKey)) +
                 '</option>'
         ).join('');
+        const flagIcon = (window.ICONS && window.ICONS.get('flag')) || '';
         return (
             '<div class="report-form">' +
-            '<div class="report-title">🚩 ' +
+            '<div class="report-title">' +
+            flagIcon +
+            '<span>' +
             esc(t('report.title')) +
+            '</span>' +
             '</div>' +
             '<label for="rf-reason" class="report-label">' +
             esc(t('report.reason')) +
@@ -144,9 +158,13 @@
     }
 
     function renderButtonHtml() {
+        const flagIcon = (window.ICONS && window.ICONS.get('flag')) || '';
         return (
             '<button type="button" class="report-btn" data-report-open>' +
+            flagIcon +
+            '<span>' +
             esc(t('report.button')) +
+            '</span>' +
             '</button>'
         );
     }
@@ -166,8 +184,15 @@
         }
 
         function paintThanks() {
+            const checkIcon =
+                (window.ICONS && window.ICONS.get('check')) || '';
             host.innerHTML =
-                '<p class="report-thanks">' + esc(t('report.sent')) + '</p>';
+                '<p class="report-thanks">' +
+                checkIcon +
+                '<span>' +
+                esc(t('report.sent')) +
+                '</span>' +
+                '</p>';
         }
 
         function openForm() {
@@ -189,7 +214,7 @@
 
             ensureTurnstile().then((ready) => {
                 if (!ready || !SITE_KEY) {
-                    status.textContent = t('report.turnstileUnavailable');
+                    setStatus(status, 'alert', t('report.turnstileUnavailable'));
                     return;
                 }
                 try {
@@ -209,15 +234,17 @@
                         }
                     });
                 } catch (e) {
-                    status.textContent = t('report.turnstileError', {
-                        msg: e.message
-                    });
+                    setStatus(
+                        status,
+                        'alert',
+                        t('report.turnstileError', { msg: e.message })
+                    );
                 }
             });
 
             submitBtn.addEventListener('click', async () => {
                 submitBtn.disabled = true;
-                status.textContent = t('report.sending');
+                setStatus(status, null, t('report.sending'));
                 try {
                     const payload = {
                         setId: ctx.setId,
@@ -235,7 +262,7 @@
                     await submit(payload);
                     paintThanks();
                 } catch (e) {
-                    status.textContent = '✗ ' + e.message;
+                    setStatus(status, 'x', e.message);
                     submitBtn.disabled = false;
                     if (turnstileWidgetId != null && window.turnstile) {
                         try {

@@ -16,7 +16,10 @@ module.exports = [
                 localStorage: 'readonly',
                 navigator: 'readonly',
                 alert: 'readonly',
-                confirm: 'readonly'
+                confirm: 'readonly',
+                setTimeout: 'readonly',
+                clearTimeout: 'readonly',
+                requestAnimationFrame: 'readonly'
             }
         },
         rules: {

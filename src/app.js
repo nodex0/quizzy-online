@@ -173,6 +173,9 @@
                 ),
                 mode: state.mode,
                 order: state.order.slice(),
+                optionOrders: state.optionOrders.map((o) =>
+                    Array.isArray(o) ? o.slice() : null
+                ),
                 pos: state.pos,
                 answers: state.answers.map((a) =>
                     a ? { picked: a.picked, correct: !!a.correct } : null
@@ -285,7 +288,7 @@
         const btn = document.getElementById('theme-toggle');
         if (!btn) return;
         const isDark = currentTheme() === 'dark';
-        btn.textContent = isDark ? '☀️' : '🌙';
+        btn.innerHTML = window.ICONS.get(isDark ? 'sun' : 'moon');
         btn.title = isDark ? t('theme.light') : t('theme.dark');
         btn.setAttribute('aria-label', btn.title);
     }
@@ -309,12 +312,12 @@
         if (!container) return;
         const current = I18N.getLang();
         container.innerHTML = I18N.availableLangs()
-            .map(
-                (l) =>
-                    `<button type="button" class="lang-btn${
-                        l.code === current ? ' active' : ''
-                    }" data-lang="${l.code}" title="${esc(l.label)}" aria-label="${esc(l.label)}">${esc(l.short)}</button>`
-            )
+            .map((l) => {
+                const flag = window.ICONS.get('flag-' + l.code);
+                return `<button type="button" class="lang-btn${
+                    l.code === current ? ' active' : ''
+                }" data-lang="${l.code}" title="${esc(l.label)}" aria-label="${esc(l.label)}">${flag}</button>`;
+            })
             .join('');
         container.querySelectorAll('.lang-btn').forEach((btn) => {
             btn.addEventListener('click', () => {
@@ -339,6 +342,9 @@
         pos: 0,
         answers: [],
         mode: 'seq',
+        // optionOrders[qIdx] is a permutation of [0..n-1] used to render that
+        // question's options. Only populated in 'rand' mode; empty in 'seq'.
+        optionOrders: [],
         view: 'setup', // 'setup' | 'quiz'
         selectedSets: [],
         selectedRoleId: null,
@@ -386,6 +392,17 @@
         return a;
     }
 
+    // A permutation per question of its option indices. Regenerated when the
+    // user switches into random mode so each question draws a fresh layout.
+    function buildOptionOrders() {
+        return QUESTIONS.map((q) => {
+            const n = Array.isArray(q.o) ? q.o.length : 0;
+            const ids = [];
+            for (let i = 0; i < n; i++) ids.push(i);
+            return shuffle(ids);
+        });
+    }
+
     function esc(s) {
         return String(s).replace(
             /[&<>"']/g,
@@ -423,9 +440,20 @@
         el.setupHelp.textContent = customMode
             ? t('setup.customHelp')
             : t('setup.help');
-        el.setupModeToggle.textContent = customMode
-            ? t('setup.rolesToggle')
-            : t('setup.customToggle');
+        // Preserve the directional arrow when toggling between modes.
+        if (customMode) {
+            el.setupModeToggle.innerHTML =
+                window.ICONS.get('arrow-left') +
+                '<span class="btn-label">' +
+                esc(t('setup.rolesToggle')) +
+                '</span>';
+        } else {
+            el.setupModeToggle.innerHTML =
+                '<span class="btn-label">' +
+                esc(t('setup.customToggle')) +
+                '</span>' +
+                window.ICONS.get('arrow-right');
+        }
         el.setupModeToggle.hidden = !ROLES.length;
         el.roleList.hidden = customMode;
         el.setList.hidden = !customMode;
@@ -584,7 +612,7 @@
                 )}</div>
             </div>
             <div class="resume-actions">
-                <button type="button" class="primary" id="resume-btn">${esc(t('setup.resumeBtn'))}</button>
+                <button type="button" class="primary" id="resume-btn"><span class="btn-label">${esc(t('setup.resumeBtn'))}</span>${window.ICONS.get('arrow-right')}</button>
                 <button type="button" id="discard-btn">${esc(t('setup.discardBtn'))}</button>
             </div>
         `;
@@ -599,8 +627,14 @@
             });
         }
         if (discardBtn) {
-            discardBtn.addEventListener('click', () => {
-                if (!confirm(t('setup.discardConfirm'))) return;
+            discardBtn.addEventListener('click', async () => {
+                const ok = await window.Modal.confirm({
+                    message: t('setup.discardConfirm'),
+                    confirmLabel: t('setup.discardBtn'),
+                    cancelLabel: t('modal.cancel'),
+                    danger: true
+                });
+                if (!ok) return;
                 clearProgress();
                 renderResumeBanner();
             });
@@ -639,6 +673,7 @@
         QUESTIONS = buildBank(state.selectedSets);
         state.order = QUESTIONS.map((_, i) => i);
         if (state.mode === 'rand') state.order = shuffle(state.order);
+        state.optionOrders = state.mode === 'rand' ? buildOptionOrders() : [];
         state.answers = new Array(QUESTIONS.length).fill(null);
         state.pos = 0;
         state.view = 'quiz';
@@ -665,6 +700,21 @@
         state.mode = snap.mode;
         QUESTIONS = buildBank(state.selectedSets);
         state.order = snap.order.slice();
+        // Restore option permutations when the snapshot has them; rebuild on
+        // the fly if a previous version saved without them.
+        if (
+            state.mode === 'rand' &&
+            Array.isArray(snap.optionOrders) &&
+            snap.optionOrders.length === QUESTIONS.length
+        ) {
+            state.optionOrders = snap.optionOrders.map((o) =>
+                Array.isArray(o) ? o.slice() : null
+            );
+        } else if (state.mode === 'rand') {
+            state.optionOrders = buildOptionOrders();
+        } else {
+            state.optionOrders = [];
+        }
         state.answers = snap.answers.map((a) =>
             a ? { picked: a.picked, correct: !!a.correct } : null
         );
@@ -696,9 +746,11 @@
             names: label,
             count: QUESTIONS.length
         });
-        el.changeSets.textContent = role
-            ? t('quiz.changeRole')
-            : t('quiz.changeSets');
+        el.changeSets.innerHTML =
+            window.ICONS.get('arrow-left') +
+            '<span class="btn-label">' +
+            esc(t(role ? 'quiz.changeRole' : 'quiz.changeSets')) +
+            '</span>';
     }
 
     function render() {
@@ -739,16 +791,29 @@
         el.bar.style.width = ((state.pos + 1) / total) * 100 + '%';
         el.review.disabled = wrong === 0;
 
-        const setLabel = labelForSet(rawQ.setId);
-        const optionsHtml = q.o
-            .map((text, i) => {
+        // In random mode the set-source label is hidden so the user can't use
+        // the section as a hint.
+        const setLabel =
+            state.mode === 'rand' ? '' : labelForSet(rawQ.setId);
+
+        // Render options in the stored permutation (identity when seq mode).
+        // data-i carries the original index so the correctness check and
+        // persisted `picked` value remain set-agnostic.
+        const optOrder =
+            Array.isArray(state.optionOrders[qIdx]) &&
+            state.optionOrders[qIdx].length === q.o.length
+                ? state.optionOrders[qIdx]
+                : q.o.map((_, i) => i);
+        const optionsHtml = optOrder
+            .map((origIdx, displayPos) => {
+                const text = q.o[origIdx];
                 let cls = 'opt';
                 if (answered) {
-                    if (i === q.a) cls += ' correct';
-                    else if (i === answered.picked) cls += ' incorrect';
+                    if (origIdx === q.a) cls += ' correct';
+                    else if (origIdx === answered.picked) cls += ' incorrect';
                 }
-                return `<button class="${cls}" data-i="${i}" ${answered ? 'disabled' : ''}>
-                    <span class="letter">${LETTERS[i]}</span>
+                return `<button class="${cls}" data-i="${origIdx}" ${answered ? 'disabled' : ''}>
+                    <span class="letter">${LETTERS[displayPos]}</span>
                     <span>${esc(text)}</span>
                 </button>`;
             })
@@ -757,9 +822,10 @@
         let feedback = '';
         if (answered) {
             if (answered.correct) {
-                feedback = `<div class="feedback ok show">${esc(t('quiz.correct'))}</div>`;
+                feedback = `<div class="feedback ok show">${window.ICONS.get('check')}<span>${esc(t('quiz.correct'))}</span></div>`;
             } else {
-                feedback = `<div class="feedback ko show">${esc(t('quiz.wrongPrefix'))} <b>${LETTERS[q.a]})</b> ${esc(q.o[q.a])}</div>`;
+                const correctDisplayPos = optOrder.indexOf(q.a);
+                feedback = `<div class="feedback ko show">${window.ICONS.get('x')}<span>${esc(t('quiz.wrongPrefix'))} <b>${LETTERS[correctDisplayPos]})</b> ${esc(q.o[q.a])}</span></div>`;
             }
         }
 
@@ -775,8 +841,8 @@
                 <div class="options">${optionsHtml}</div>
                 ${feedback}
                 <div class="nav">
-                    <button id="prev" ${state.pos === 0 ? 'disabled' : ''}>${esc(t('quiz.prev'))}</button>
-                    <button id="next" class="primary" ${state.pos === total - 1 ? 'disabled' : ''}>${esc(t('quiz.next'))}</button>
+                    <button id="prev" ${state.pos === 0 ? 'disabled' : ''}>${window.ICONS.get('arrow-left')}<span class="btn-label">${esc(t('quiz.prev'))}</span></button>
+                    <button id="next" class="primary" ${state.pos === total - 1 ? 'disabled' : ''}><span class="btn-label">${esc(t('quiz.next'))}</span>${window.ICONS.get('arrow-right')}</button>
                 </div>
                 <div id="report-host" class="report-host"></div>
             </div>
@@ -852,7 +918,29 @@
         });
     }
 
-    function setMode(m) {
+    async function setMode(m) {
+        if (m === state.mode) return;
+        // Flipping the order mid-quiz reshuffles questions (and options in
+        // random mode) so any already-answered positions become misleading.
+        // Warn and clear the answer slate when the user has committed answers.
+        const hasAnswers =
+            state.view === 'quiz' &&
+            state.answers.some((a) => a !== null);
+        if (hasAnswers) {
+            const ok = await window.Modal.confirm({
+                message: t('mode.changeConfirm'),
+                confirmLabel: t('mode.changeBtn'),
+                cancelLabel: t('modal.cancel'),
+                danger: true
+            });
+            if (!ok) {
+                // Revert: leave mode unchanged and keep the active-button
+                // indicator in sync with the real state.
+                el.modeSeq.classList.toggle('active', state.mode === 'seq');
+                el.modeRand.classList.toggle('active', state.mode === 'rand');
+                return;
+            }
+        }
         state.mode = m;
         el.modeSeq.classList.toggle('active', m === 'seq');
         el.modeRand.classList.toggle('active', m === 'rand');
@@ -861,6 +949,10 @@
             m === 'rand'
                 ? shuffle(QUESTIONS.map((_, i) => i))
                 : QUESTIONS.map((_, i) => i);
+        state.optionOrders = m === 'rand' ? buildOptionOrders() : [];
+        if (hasAnswers) {
+            state.answers = new Array(QUESTIONS.length).fill(null);
+        }
         state.pos = 0;
         saveProgress();
         render();
@@ -911,8 +1003,13 @@
         });
     }
 
-    el.restart.addEventListener('click', () => {
-        const ok = confirm(t('restart.confirm'));
+    el.restart.addEventListener('click', async () => {
+        const ok = await window.Modal.confirm({
+            message: t('restart.confirm'),
+            confirmLabel: t('quiz.resetNow'),
+            cancelLabel: t('modal.cancel'),
+            danger: true
+        });
         if (!ok) return;
         resetCurrentQuiz();
     });

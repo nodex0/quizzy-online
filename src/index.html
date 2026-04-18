@@ -84,9 +84,7 @@
                     data-i18n-attr="aria-label:theme.toggle,title:theme.toggle"
                     aria-label="Cambiar tema"
                     title="Cambiar tema"
-                >
-                    🌙
-                </button>
+                ></button>
             </div>
 
             <div id="setup-area">
@@ -111,8 +109,9 @@
                             id="setup-mode-toggle"
                             class="link-btn"
                             data-i18n="setup.customToggle"
+                            data-i18n-icon-trailing="arrow-right"
                         >
-                            Elegir conjuntos manualmente →
+                            Elegir conjuntos manualmente
                         </button>
                     </div>
                     <div class="nav">
@@ -127,8 +126,9 @@
                             class="primary"
                             disabled
                             data-i18n="setup.start"
+                            data-i18n-icon-trailing="arrow-right"
                         >
-                            Empezar →
+                            Empezar
                         </button>
                     </div>
                 </div>
@@ -139,20 +139,34 @@
                     <div class="mode-toggle">
                         <button
                             id="mode-seq"
-                            class="active"
+                            class="active has-tooltip"
                             data-i18n="quiz.modeSeq"
+                            data-i18n-attr="data-tooltip:quiz.seqTooltip"
                         >
                             Orden
                         </button>
-                        <button id="mode-rand" data-i18n="quiz.modeRand">
+                        <button
+                            id="mode-rand"
+                            class="has-tooltip"
+                            data-i18n="quiz.modeRand"
+                            data-i18n-attr="data-tooltip:quiz.randTooltip"
+                        >
                             Aleatorio
                         </button>
                     </div>
-                    <button id="change-sets" data-i18n="quiz.changeSets">
-                        ← Cambiar conjuntos
+                    <button
+                        id="change-sets"
+                        data-i18n="quiz.changeSets"
+                        data-i18n-icon="arrow-left"
+                    >
+                        Cambiar conjuntos
                     </button>
-                    <button id="restart" data-i18n="quiz.restart">
-                        ↻ Reiniciar
+                    <button
+                        id="restart"
+                        data-i18n="quiz.restart"
+                        data-i18n-icon="rotate-ccw"
+                    >
+                        Reiniciar
                     </button>
                     <button id="review" disabled data-i18n="quiz.review">
                         Ver fallos
@@ -215,7 +229,9 @@
                 document.head.appendChild(s);
             })();
         </script>
+        <script src="./icons.js"></script>
         <script src="./i18n.js"></script>
+        <script src="./modal.js"></script>
         <script src="./data/comun.js"></script>
         <script src="./data/celador.js"></script>
         <script src="./data/auxiliar_admin.js"></script>
