@@ -21,9 +21,10 @@
 
     const TRANSLATIONS = {
         es: {
-            title: 'Quizzy Online — OPE Osakidetza',
-            'header.title': 'Quizzy — OPE Osakidetza',
+            title: 'OPE Osakidetza',
+            'header.title': 'OPE Osakidetza',
             'header.subtitle': 'Test de práctica',
+            'header.home': 'Volver al inicio',
             'stats.question': 'Pregunta',
             'stats.correct': 'Aciertos',
             'stats.wrong': 'Fallos',
@@ -64,15 +65,36 @@
             'setup.resumeBtn': 'Continuar →',
             'setup.discardBtn': 'Descartar',
             'setup.discardConfirm':
-                '¿Descartar el test en curso?\n\nPerderás las respuestas guardadas.'
+                '¿Descartar el test en curso?\n\nPerderás las respuestas guardadas.',
+            'report.button': '🚩 Reportar pregunta',
+            'report.title': 'Reportar un error en esta pregunta',
+            'report.reason': 'Motivo',
+            'report.reasonWrong': 'Respuesta incorrecta',
+            'report.reasonUnclear': 'Pregunta confusa',
+            'report.reasonTypo': 'Errata',
+            'report.reasonOther': 'Otro',
+            'report.body': 'Descripción (opcional)',
+            'report.bodyPlaceholder':
+                'Describe brevemente el problema (opcional)...',
+            'report.nickname': 'Apodo (opcional)',
+            'report.nicknamePlaceholder': 'Anónimo',
+            'report.cancel': 'Cancelar',
+            'report.submit': 'Enviar',
+            'report.sending': 'Enviando…',
+            'report.sent': '✓ Reporte enviado. Gracias.',
+            'report.turnstileUnavailable':
+                '⚠ Anti-spam no disponible. Contacta al administrador.',
+            'report.turnstileError': '⚠ Error Turnstile: {msg}',
+            'report.sendError': 'Error al enviar'
         },
         eu: {
-            title: 'Quizzy Online — OPE Osakidetza',
-            'header.title': 'Quizzy — OPE Osakidetza',
+            title: 'OPE Osakidetza',
+            'header.title': 'OPE Osakidetza',
             'header.subtitle': 'Praktika testa',
+            'header.home': 'Hasierara itzuli',
             'stats.question': 'Galdera',
             'stats.correct': 'Asmatuak',
-            'stats.wrong': 'Hutsak',
+            'stats.wrong': 'Akatsak',
             'stats.percent': '% asmatze',
             'theme.toggle': 'Gaia aldatu',
             'theme.light': 'Gai argia',
@@ -92,7 +114,7 @@
             'quiz.modeRand': 'Ausazkoa',
             'quiz.changeSets': '← Multzoak aldatu',
             'quiz.restart': '↻ Berrabiarazi',
-            'quiz.review': 'Hutsak ikusi',
+            'quiz.review': 'Akatsak ikusi',
             'quiz.jumpTo': 'Galderara joan…',
             'quiz.loadError': 'Errorea galdera kargatzean.',
             'quiz.resetNow': 'Berrabiarazi',
@@ -110,7 +132,27 @@
             'setup.resumeBtn': 'Jarraitu →',
             'setup.discardBtn': 'Baztertu',
             'setup.discardConfirm':
-                'Martxan dagoen testa baztertu?\n\nGordetako erantzunak galduko dituzu.'
+                'Martxan dagoen testa baztertu?\n\nGordetako erantzunak galduko dituzu.',
+            'report.button': '🚩 Galdera salatu',
+            'report.title': 'Galdera honetako akatsa salatu',
+            'report.reason': 'Arrazoia',
+            'report.reasonWrong': 'Erantzun okerra',
+            'report.reasonUnclear': 'Galdera nahasia',
+            'report.reasonTypo': 'Idazkera akatsa',
+            'report.reasonOther': 'Bestelakoa',
+            'report.body': 'Deskripzioa (aukerakoa)',
+            'report.bodyPlaceholder':
+                'Azaldu laburki zein den arazoa (aukerakoa)...',
+            'report.nickname': 'Ezizena (aukerakoa)',
+            'report.nicknamePlaceholder': 'Anonimoa',
+            'report.cancel': 'Utzi',
+            'report.submit': 'Bidali',
+            'report.sending': 'Bidaltzen…',
+            'report.sent': '✓ Txostena bidalita. Eskerrik asko.',
+            'report.turnstileUnavailable':
+                '⚠ Anti-spam ez dago erabilgarri. Jarri harremanetan administratzailearekin.',
+            'report.turnstileError': '⚠ Turnstile errorea: {msg}',
+            'report.sendError': 'Errorea bidaltzean'
         }
     };
 
