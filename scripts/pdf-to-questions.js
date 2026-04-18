@@ -192,8 +192,20 @@ function parseBlock(n, firstStem, blockLines) {
         }
         // phase === 'opts'
         if (inlineIdx >= 0) {
-            // Continuation wrap of the most recent inline label.
-            labels[inlineIdx].inline += ' ' + line;
+            // If a bare label is still waiting and the inline label's text
+            // already ends in sentence punctuation, this line is a floating
+            // paragraph for the bare label, not a continuation. Handles the
+            // column-break case where one option's text floats below the
+            // others (e.g., q100 in OPERARIO-DE-SERVICIOS).
+            const hasBareWaiting = labels.some((l) => !l.inline);
+            if (hasBareWaiting && endsSentence(labels[inlineIdx].inline)) {
+                inlineIdx = -1;
+                curPara += (curPara ? ' ' : '') + line;
+                if (endsSentence(line)) flushPara();
+            } else {
+                // Continuation wrap of the most recent inline label.
+                labels[inlineIdx].inline += ' ' + line;
+            }
         } else {
             // Floating text after a bare label: a paragraph closes the
             // moment its line ends with sentence punctuation.
@@ -373,7 +385,11 @@ function main() {
     const description = args.description || '';
     const outPath = args.out || path.join('src', 'data', `${id}.js`);
 
-    const text = runPdftotext(pdfPath, { raw: !!args.raw });
+    // Allow a pre-extracted (and possibly hand-fixed) text file to bypass
+    // pdftotext for PDFs whose layout breaks the default extraction.
+    const text = args['input-text']
+        ? fs.readFileSync(args['input-text'], 'utf8')
+        : runPdftotext(pdfPath, { raw: !!args.raw });
     const questions = parseQuestions(text);
 
     if (!questions.length) die('No questions were parsed from the PDF.');
