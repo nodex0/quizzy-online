@@ -21,14 +21,19 @@
             commonSetId: 'comun',
             specificSetId: 'celador',
             names: { es: 'Celador/a', eu: 'Zeladorea' },
+            // Tabler Icons: wheelchair (MIT). Side-view wheelchair — the
+            // universally-recognised disability symbol, fitting because
+            // celadores/as move patients in wheelchairs.
             icon:
                 '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
-                'stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" ' +
+                'stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" ' +
                 'aria-hidden="true">' +
-                '<circle cx="12" cy="4.5" r="1.8"/>' +
-                '<path d="M10.5 7.5v5h4l1.5 3"/>' +
-                '<circle cx="10" cy="17" r="4.5"/>' +
-                '<path d="M14.5 17h3"/>' +
+                '<path d="M3 16a5 5 0 1 0 10 0a5 5 0 1 0 -10 0"/>' +
+                '<path d="M17 19a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/>' +
+                '<path d="M19 17a3 3 0 0 0 -3 -3h-3.4"/>' +
+                '<path d="M3 3h1a2 2 0 0 1 2 2v6"/>' +
+                '<path d="M6 8h11"/>' +
+                '<path d="M15 8v6"/>' +
                 '</svg>'
         },
         {
@@ -39,15 +44,18 @@
                 es: 'Auxiliar Administrativo/a',
                 eu: 'Administrari laguntzailea'
             },
+            // Lucide: clipboard-list (ISC). Evokes formularios and expediente
+            // administrative work.
             icon:
                 '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
-                'stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" ' +
+                'stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" ' +
                 'aria-hidden="true">' +
-                '<rect x="5" y="4" width="14" height="18" rx="2"/>' +
-                '<rect x="8" y="2" width="8" height="4" rx="1"/>' +
-                '<path d="M8 11h8"/>' +
-                '<path d="M8 15h8"/>' +
-                '<path d="M8 19h5"/>' +
+                '<rect width="8" height="4" x="8" y="2" rx="1" ry="1"/>' +
+                '<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>' +
+                '<path d="M12 11h4"/>' +
+                '<path d="M12 16h4"/>' +
+                '<path d="M8 11h.01"/>' +
+                '<path d="M8 16h.01"/>' +
                 '</svg>'
         },
         {
@@ -58,11 +66,12 @@
                 es: 'Operario/a de Servicios',
                 eu: 'Zerbitzuetako langilea'
             },
+            // Lucide: wrench (ISC). Classic maintenance/servicios icon.
             icon:
                 '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
-                'stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" ' +
+                'stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" ' +
                 'aria-hidden="true">' +
-                '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4l-6.6 6.6a1.5 1.5 0 0 0 2.1 2.1l6.6-6.6a4 4 0 0 0 5.4-5.4l-2.4 2.4-2.1-2.1z"/>' +
+                '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z"/>' +
                 '</svg>'
         }
     ];
