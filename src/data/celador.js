@@ -6,11 +6,11 @@
 (window.QUESTION_SETS = window.QUESTION_SETS || []).push({
   id: "celador",
   name: "Celador/a — Parte específica",
-  description: "OPE Osakidetza · 200 preguntas",
+  description: "OPE Osakidetza · Temario Específico · 200 preguntas",
   translations: {
     eu: {
-      name: "Zeladorea — Berariazko zatia",
-      description: "OPE Osakidetza · 200 galdera"
+      name: "Zeladorea — Zati espezifikoa",
+      description: "OPE Osakidetza · Gai espezifikoa · 200 galdera"
     }
   },
   questions: [
