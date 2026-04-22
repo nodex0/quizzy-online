@@ -73,6 +73,25 @@
                 'aria-hidden="true">' +
                 '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z"/>' +
                 '</svg>'
+        },
+        {
+            id: 'tecnico_laboratorio',
+            commonSetId: 'comun_abc1',
+            specificSetId: 'tecnico_laboratorio',
+            names: {
+                es: 'Técnico/a de Laboratorio',
+                eu: 'Laborategiko teknikaria'
+            },
+            // Lucide: flask-conical (ISC). Laboratory flask — fits a
+            // laboratory technician role.
+            icon:
+                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+                'stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" ' +
+                'aria-hidden="true">' +
+                '<path d="M14 2v6a2 2 0 0 0 .245.96l5.51 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.755-2.96l5.51-10.08A2 2 0 0 0 10 8V2"/>' +
+                '<path d="M6.453 15h11.094"/>' +
+                '<path d="M8.5 2h7"/>' +
+                '</svg>'
         }
     ];
 
